@@ -1,26 +1,31 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoLists.App.Models;
+using TodoLists.App.Services;
 
 namespace TodoLists.App.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class TodoItemsController : ControllerBase
 {
-    private readonly TodoContext _context;
+    private readonly TodoContext myContext;
+    private readonly IUserService myUserService;
 
-    public TodoItemsController(TodoContext context)
+    public TodoItemsController(TodoContext context, IUserService userService)
     {
-        _context = context;
+        myContext = context;
+        myUserService = userService;
     }
 
     // GET: api/TodoItems
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems()
     {
-        return await _context.TodoItems
-            .Select(x => ItemToDTO(x))
+        return await myContext.TodoItems
+            .Select(x => ItemToDto(x))
             .ToListAsync();
     }
 
@@ -29,14 +34,14 @@ public class TodoItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoItemDto>> GetTodoItem(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await myContext.TodoItems.FindAsync(id);
 
         if (todoItem == null)
         {
             return NotFound();
         }
 
-        return ItemToDTO(todoItem);
+        return ItemToDto(todoItem);
     }
     // </snippet_GetByID>
 
@@ -51,7 +56,7 @@ public class TodoItemsController : ControllerBase
             return BadRequest();
         }
 
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await myContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
@@ -62,7 +67,7 @@ public class TodoItemsController : ControllerBase
 
         try
         {
-            await _context.SaveChangesAsync();
+            await myContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
         {
@@ -77,21 +82,19 @@ public class TodoItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Create>
     [HttpPost]
-    public async Task<ActionResult<TodoItemDto>> PostTodoItem(TodoItemDto todoDTO)
+    public async Task<ActionResult<TodoItemDto>> PostTodoItem(TodoItemDto todoDto)
     {
         var todoItem = new TodoItem
         {
-            IsComplete = todoDTO.IsComplete,
-            Name = todoDTO.Name
+            Profile = await myContext.Profiles.SingleAsync(x => x.Name == myUserService.GetCurrentUserProfileName()),
+            IsComplete = todoDto.IsComplete,
+            Name = todoDto.Name,
         };
 
-        _context.TodoItems.Add(todoItem);
-        await _context.SaveChangesAsync();
+        myContext.TodoItems.Add(todoItem);
+        await myContext.SaveChangesAsync();
 
-        return CreatedAtAction(
-            nameof(GetTodoItem),
-            new { id = todoItem.Id },
-            ItemToDTO(todoItem));
+        return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, ItemToDto(todoItem));
     }
     // </snippet_Create>
 
@@ -99,24 +102,24 @@ public class TodoItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await myContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
         }
 
-        _context.TodoItems.Remove(todoItem);
-        await _context.SaveChangesAsync();
+        myContext.TodoItems.Remove(todoItem);
+        await myContext.SaveChangesAsync();
 
         return NoContent();
     }
 
     private bool TodoItemExists(long id)
     {
-        return _context.TodoItems.Any(e => e.Id == id);
+        return myContext.TodoItems.Any(e => e.Id == id);
     }
 
-    private static TodoItemDto ItemToDTO(TodoItem todoItem) =>
+    private static TodoItemDto ItemToDto(TodoItem todoItem) =>
        new TodoItemDto
        {
            Id = todoItem.Id,
