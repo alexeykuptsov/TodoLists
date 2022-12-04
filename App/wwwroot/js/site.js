@@ -123,3 +123,44 @@ function _displayItems(data) {
 
     todos = data;
 }
+
+$(() => {
+    const loginForm = $('#login-form').dxForm({
+        colCount: 2,
+        formData: {},
+        items: [{
+            dataField: 'profile',
+            label: 'Профиль',
+        }, {
+            dataField: 'username',
+            label: 'Логин',
+        }, {
+            dataField: 'password',
+            label: 'Пароль',
+            editorOptions: {
+                mode: 'password',
+            }
+        }],
+    }).dxForm('instance');
+    
+    $('#login-button').dxButton({
+        stylingMode: 'contained',
+        text: 'Войти',
+        type: 'default',
+        width: 120,
+        onClick() {
+            let userDto = loginForm.option('formData');
+            let validationResult = loginForm.validate();
+            DevExpress.ui.notify('The Contained button was clicked ' + JSON.stringify(userDto));
+
+            fetch('https://localhost:7147/api/Auth/Login', {
+                method: 'POST', headers: {
+                    'Accept': 'text', 'Content-Type': 'application/json'
+                }, body: JSON.stringify(userDto)
+            })
+                .then(response => response.text())
+                .then(token => localStorage.setItem('authToken', token))
+                .catch(error => DevExpress.ui.notify('Не удалось войти.', error));
+        },
+    })
+});

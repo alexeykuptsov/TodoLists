@@ -1,8 +1,4 @@
-﻿$ScriptPath = $MyInvocation.MyCommand.Path
-$ProjectDir = Join-Path (Split-Path $ScriptPath) ".." -Resolve
-Write-Output $ProjectDir
-Push-Location $ProjectDir
-
+﻿Push-Location (Join-Path (Split-Path $MyInvocation.MyCommand.Path) ".." -Resolve)
 try
 {
     . LocalDevScripts/Common.ps1
