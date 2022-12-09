@@ -127,6 +127,7 @@ function _displayItems(data) {
 $(() => {
     const loginForm = $('#login-form').dxForm({
         colCount: 2,
+        labelMode: 'floating',
         formData: {},
         items: [{
             dataField: 'profile',
