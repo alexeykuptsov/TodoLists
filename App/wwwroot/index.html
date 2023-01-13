@@ -15,83 +15,15 @@
         <div id="vapp">
             <user-panel v-show="userName != null"></user-panel>
             <login-button v-show="userName == null"></login-button>
+            <no-access-panel v-show="userName == null"></no-access-panel>
+            <main-panel v-show="userName != null"></main-panel>
         </div>
         <script>
-            Vue.component('UserPanel', {
-                data: function() {
-                    return {
-                        userName: this.$root.userName,
-                    }
-                },
-                template:
-                    `<div>
-                        <div style="display: inline-block;">{{ userName }}</div>
-                        <a onclick="vueApp.logout();" href='#'>Выйти</a>
-                    </div>`
-            });
-            Vue.component('LoginButton', {
-                template: 
-                    `<a onclick="vueApp.login();">Войти</a>`
-            });
-            let authToken = localStorage.getItem('authToken');
-            let userName = null;
-            if (authToken !== null) {
-                let authTokenJson = JSON.parse(atob(authToken.split('.')[1]));
-                userName = authTokenJson['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-            }
-            const vueApp = new Vue({
-                el: '#vapp',
-                data: {
-                    display: 'redbox',
-                    userName: userName,
-                },
-                methods: {
-                    logout() {
-                        localStorage.removeItem("authToken");
-                        this.isAuthenticated = false;
-                    }
-                }
-            });
         </script>
         
-        <div>
-            <div id="login-form"></div>
-            <div id="login-button"></div>
-        </div>
-        <h1>To-do CRUD</h1>
-        <h3>Add</h3>
-        <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
-            <input type="text" id="add-name" placeholder="New to-do">
-            <input type="submit" value="Add">
-        </form>
         
-        <div id="editForm">
-            <h3>Edit</h3>
-            <form action="javascript:void(0);" onsubmit="updateItem()">
-                <input type="hidden" id="edit-id">
-                <input type="checkbox" id="edit-isComplete">
-                <input type="text" id="edit-name">
-                <input type="submit" value="Save">
-                <a onclick="closeInput()" aria-label="Close">&#10006;</a>
-            </form>
-        </div>
-        
-        <p id="counter"></p>
-        
-        <table>
-            <tr>
-                <th>Is Complete?</th>
-                <th>Name</th>
-                <th></th>
-                <th></th>
-            </tr>
-            <tbody id="todos"></tbody>
-        </table>
         
         <script src="js/site.js"></script>
-        <script type="text/javascript">
-            getItems();
-        </script>
     </div>
 </body>
 </html>
