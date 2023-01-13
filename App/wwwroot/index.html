@@ -26,11 +26,12 @@
                 template:
                     `<div>
                         <div style="display: inline-block;">{{ userName }}</div>
-                        <a onclick='vueApp.logout();' href='#'>Выйти</a>
+                        <a onclick="vueApp.logout();" href='#'>Выйти</a>
                     </div>`
             });
             Vue.component('LoginButton', {
-                template: "<a href=\"/login/\">Войти</a>"
+                template: 
+                    `<a onclick="vueApp.login();">Войти</a>`
             });
             let authToken = localStorage.getItem('authToken');
             let userName = null;
