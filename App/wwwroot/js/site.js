@@ -2,10 +2,22 @@ const uri = 'api/todoitems';
 let todos = [];
 
 function refreshPageData() {
-    fetch(uri)
-        .then(response => response.json())
+    let authToken = localStorage.getItem('authToken');
+    fetch(uri, {
+        headers: {
+            'Authorization': 'Bearer ' + authToken,
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+            }
+            return response.json();
+        })
         .then(data => _displayItems(data))
-        .catch(error => DevExpress.ui.notify('Unable to get items.', error));
+        .catch(error => {
+            DevExpress.ui.notify('Unable to get items.', error.message)
+        });
 }
 
 function addItem() {
@@ -290,7 +302,7 @@ $(() => {
                 body: JSON.stringify(userDto),
             })
                 .then(response => {
-                    if (response.status == 401) {
+                    if (response.status === 401) {
                         DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
                     }
                     if (!response.ok) {
