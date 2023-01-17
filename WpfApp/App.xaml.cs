@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows;
+using WpfApp.ViewModels;
 
 namespace WpfApp
 {
@@ -25,6 +25,13 @@ namespace WpfApp
                 RedirectStandardInput = true,
                 CreateNoWindow = true,
             });
+        }
+
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+
+            MainWindow.DataContext = new MainWindowViewModel(myAppProcess!);
         }
 
         protected override void OnExit(ExitEventArgs e)
