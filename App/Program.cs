@@ -1,3 +1,5 @@
+using System.Configuration;
+using Serilog;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,58 +9,82 @@ using Swashbuckle.AspNetCore.Filters;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("TodoLists.App.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+    .WriteTo.Console()
+    .CreateLogger();
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<TodoContext>(options =>
+Log.Information("Start.");
+
+try
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("TodoContext"));
-    options.UseSnakeCaseNamingConvention();
-});
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog();
+    
+    builder.Services.AddControllers();
+    builder.Services.AddDbContext<TodoContext>(options =>
     {
-        Description = "Standard Authorization header using Bearer scheme (\"Bearer {token}\").",
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        options.UseNpgsql(builder.Configuration.GetConnectionString("TodoContext"));
+        options.UseSnakeCaseNamingConvention();
     });
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
-});
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    var jwtKeyBytes = Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:JwtKey").Value!);
-    options.TokenValidationParameters = new TokenValidationParameters
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(jwtKeyBytes),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-    };
-});
+        options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+        {
+            Description = "Standard Authorization header using Bearer scheme (\"Bearer {token}\").",
+            In = ParameterLocation.Header,
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
+        });
+        options.OperationFilter<SecurityRequirementsOperationFilter>();
+    });
 
-var app = builder.Build();
+    var jwtKey = builder.Configuration.GetSection("AppSettings:JwtKey").Value ?? throw new ConfigurationErrorsException("Required configuration option AppSettings:JwtKey is not set.");
 
-if (app.Environment.IsDevelopment())
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+    {
+        var jwtKeyBytes = Encoding.UTF8.GetBytes(jwtKey);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtKeyBytes),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+        };
+    });
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+    }
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
 {
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+Log.Information("Exited gracefully.");
