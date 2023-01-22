@@ -80,7 +80,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Log.Fatal(ex, "Failed to init the application");
 }
 finally
 {

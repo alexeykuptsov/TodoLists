@@ -1,25 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using WpfApp.Windows.Input;
 
 namespace WpfApp.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
-    private readonly Process myAppProcess;
     private string myTodoListsAppStatusText;
+    private string myPostgresStatusText;
 
-    public MainWindowViewModel(Process appProcess)
+    public MainWindowViewModel(Process todoListsAppProcess, Process postgresProcess)
     {
-        myAppProcess = appProcess;
-        TodoListsAppStatusText = myAppProcess.HasExited ? "TodoLists.App не работает" : "TodoLists.App OK";
-        myAppProcess.Exited += (sender, args) =>
+        todoListsAppProcess.Exited += (_, _) =>
         {
             TodoListsAppStatusText = "TodoLists.App не работает";
         };
+        myTodoListsAppStatusText = todoListsAppProcess.HasExited ? "TodoLists.App не работает" : "TodoLists.App OK";
+
+        postgresProcess.Exited += (_, _) =>
+        {
+            PostgresStatusText = "PostgreSQL не работает";
+        };
+        myPostgresStatusText = postgresProcess.HasExited ? "PostgreSQL не работает" : "PostgreSQL OK";
+    }
+
+    public string PostgresStatusText
+    {
+        get => myPostgresStatusText;
+        set => SetField(ref myPostgresStatusText, value);
     }
 
     public string TodoListsAppStatusText
