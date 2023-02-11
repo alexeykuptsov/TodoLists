@@ -1,17 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace WpfApp.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
+    private readonly Process myPostgresProcess;
     private string myTodoListsAppStatusText;
     private string myPostgresStatusText;
 
     public MainWindowViewModel(Process todoListsAppProcess, Process postgresProcess)
     {
+        myPostgresProcess = postgresProcess;
         todoListsAppProcess.Exited += (_, _) =>
         {
             TodoListsAppStatusText = "TodoLists.App не работает";
@@ -20,9 +24,38 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         postgresProcess.Exited += (_, _) =>
         {
-            PostgresStatusText = "PostgreSQL не работает";
+            UpdatePostgresStatusText();
         };
-        myPostgresStatusText = postgresProcess.HasExited ? "PostgreSQL не работает" : "PostgreSQL OK";
+        UpdatePostgresStatusText();
+    }
+
+    private void UpdatePostgresStatusText()
+    {
+        if (!myPostgresProcess.HasExited)
+        {
+            PostgresStatusText = "PostgreSQL OK";
+            return;
+        }
+
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.AppendLine("PostgreSQL не работает");
+        try
+        {
+            resultBuilder.AppendLine("stderr: " + myPostgresProcess.StandardError.ReadToEnd());
+        }
+        catch (InvalidOperationException e)
+        {
+            resultBuilder.AppendLine("stderr: " + e.Message);
+        }
+        try
+        {
+            resultBuilder.AppendLine("stdout: " + myPostgresProcess.StandardOutput.ReadToEnd());
+        }
+        catch (InvalidOperationException e)
+        {
+            resultBuilder.AppendLine("stdout: " + e.Message);
+        }
+        PostgresStatusText = resultBuilder.ToString();
     }
 
     public string PostgresStatusText

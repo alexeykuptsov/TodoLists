@@ -556,3 +556,4 @@ FodyWeavers.xsd
 # Нужно создавать из appsettings.Development.example.json
 appsettings.Development.json
 /pgsql
+/data

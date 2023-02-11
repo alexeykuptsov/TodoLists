@@ -29,7 +29,7 @@ namespace WpfApp
                     .WriteTo.File("TodoLists.Launcher.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
                     .WriteTo.Console()
                     .CreateLogger();
-                Log.Information("Start.");
+                Log.Information("Start");
 
                 AppDomain.CurrentDomain.UnhandledException += (_, args) =>
                 {
@@ -68,10 +68,11 @@ namespace WpfApp
                 if (!Directory.Exists(postgresDataDir))
                 {
                     Directory.CreateDirectory(postgresDataDir);
+                    var passFilePath = Path.Combine(postgresWorkingDir, "../pass.txt");
                     var initDbProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = Path.Combine(postgresWorkingDir, "initdb.exe"),
-                        Arguments = $"-D {postgresDataDir} -U postgres -W -E UTF8 -A scram-sha-256",
+                        Arguments = $"-D {postgresDataDir} -U postgres --no-locale -E UTF8 -A scram-sha-256 --pwfile={passFilePath}",
                         WorkingDirectory = postgresWorkingDir,
                         WindowStyle = ProcessWindowStyle.Hidden,
                         RedirectStandardInput = true,
@@ -86,11 +87,12 @@ namespace WpfApp
 
                 myPostgresProcess = Process.Start(new ProcessStartInfo
                 {
-                    FileName = Path.Combine(postgresWorkingDir, "postgresql.exe"),
-                    Arguments = "",
+                    FileName = Path.Combine(postgresWorkingDir, "pg_ctl.exe"),
+                    Arguments = $"-D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start",
                     WorkingDirectory = postgresWorkingDir,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     RedirectStandardInput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true,
                 });
             }
@@ -115,7 +117,7 @@ namespace WpfApp
             myPostgresProcess?.Kill();
 
             if (e.ApplicationExitCode == 0)
-                Log.Information("Exited gracefully.");
+                Log.Information("Exited gracefully");
             Log.CloseAndFlush();
             
             base.OnExit(e);
