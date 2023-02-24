@@ -85,10 +85,11 @@ namespace WpfApp
                     }
                 }
 
+                var pgCtlArguments = $"-o \"-p 41577\" -D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start";
                 myPostgresProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = Path.Combine(postgresWorkingDir, "pg_ctl.exe"),
-                    Arguments = $"-D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start",
+                    Arguments = pgCtlArguments,
                     WorkingDirectory = postgresWorkingDir,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     RedirectStandardInput = true,

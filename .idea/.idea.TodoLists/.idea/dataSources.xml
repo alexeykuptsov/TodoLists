@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/todo_lists</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="postgres@localhost:55432" uuid="20db9576-3e4a-45df-ac02-37c227274e76">
+    <data-source source="LOCAL" name="postgres@localhost:41577" uuid="20db9576-3e4a-45df-ac02-37c227274e76">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
