@@ -1,4 +1,9 @@
-﻿# Списки To-Do
+﻿# To-Do Lists
+
+## Getting Started
+
+To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
+https://localhost:7147 in a browser.
 
 ## Создание базы с нуля
 
