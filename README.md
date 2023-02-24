@@ -5,6 +5,12 @@
 To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
 https://localhost:7147 in a browser.
 
+## User Story Personas
+
+*Kevin* uses To-Do Lists app hlsted on his local machine.
+His OS is Windows.
+He installs the app by unpacking a ZIP distributive and followinf section Getting Started.
+
 ## Создание базы с нуля
 
 Нужна база Postgres (проверялось на версии 14, на других тоже должно работать).
