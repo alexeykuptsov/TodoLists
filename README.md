@@ -13,6 +13,8 @@ https://localhost:7147 in a browser.
 
 ## Development
 
+Kanban board: https://github.com/users/alexeykuptsov/projects/1/views/1
+
 ### Branching strategy
 
 We use [Git Flow](http://danielkummer.github.io/git-flow-cheatsheet/index.html).
