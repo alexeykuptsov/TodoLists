@@ -25,7 +25,7 @@ The following personas are used in user stories bug tracking and implementation 
 
 *Kevin* uses To-Do Lists app hlsted on his local machine.
 His OS is Windows.
-He installs the app by unpacking a ZIP distributive and followinf section Getting Started.
+He installs the app by unpacking a ZIP distributive and following section Getting Started.
 
 ## Создание базы с нуля
 
