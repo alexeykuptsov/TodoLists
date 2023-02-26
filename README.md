@@ -46,7 +46,7 @@ dotnet ef database update
 
 ```shell
 PS> cd App
-PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
+PS> .\LocalDevScripts\Drop_Create.ps1
 ```
 
 ## Пересоздание последней миграции
