@@ -15,6 +15,23 @@ https://localhost:7147 in a browser.
 
 Kanban board: https://github.com/users/alexeykuptsov/projects/1/views/1
 
+### After-Checkout Development Environment Setup
+
+Install Postgres 14.
+
+```shell
+dotnet tool install --global dotnet-ef
+```
+
+```postgresql
+create user todo_lists_app password 'pass' createdb;
+```
+
+```shell
+cd App
+dotnet ef database update
+```
+
 ### Branching strategy
 
 We use [Git Flow](http://danielkummer.github.io/git-flow-cheatsheet/index.html).
@@ -29,33 +46,25 @@ The following personas are used in user stories bug tracking and implementation 
 His OS is Windows.
 He installs the app by unpacking a ZIP distributive and following section Getting Started.
 
-## Создание базы с нуля
+### Working with Local Dev Database
 
-Нужна база Postgres (проверялось на версии 14, на других тоже должно работать).
+#### Drop and Create
 
-```postgresql
-create user todo_lists_app password 'pass' createdb;
-```
-
-```shell
-cd App
-dotnet ef database update
-```
-
-## Пересоздание базы
-
-Перед выполнением `database drop` нужно закрыть все подключения к БД.
+⚠
+The following script runs `database drop` so you need not close all connections to database `todo_lists`.
 
 ```shell
 PS> cd App
 PS> .\LocalDevScripts\Drop_Create.ps1
 ```
 
-## Пересоздание последней миграции
+#### Generate the Last Migration
 
-До первого релиза последняя миграция также является и единственной.
+Before version 1.0.0 the last migration is the single one.
+So the script shall be improved after the release.
 
-Перед выполнением `database drop` нужно закрыть все подключения к БД.
+⚠
+The following script runs `database drop` so you need not close all connections to database `todo_lists`.
 
 ```shell
 PS> cd App
