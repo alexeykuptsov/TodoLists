@@ -28,25 +28,36 @@ function addItem() {
         name: addNameTextbox.value.trim()
     };
 
+    let authToken = localStorage.getItem('authToken');
     fetch(uri, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Authorization': 'Bearer ' + authToken,
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(item)
     })
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Response is not OK (status=' + response.status + ')');
+        })
         .then(() => {
             refreshPageData();
             addNameTextbox.value = '';
         })
-        .catch(error => console.error('Unable to add item.', error));
+        .catch(error => DevExpress.ui.notify('Error: ' + error));
 }
 
 function deleteItem(id) {
+    let authToken = localStorage.getItem('authToken');
     fetch(`${uri}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + authToken,
+        },
     })
         .then(() => refreshPageData())
         .catch(error => console.error('Unable to delete item.', error));
@@ -69,10 +80,12 @@ function updateItem() {
         name: document.getElementById('edit-name').value.trim()
     };
 
+    let authToken = localStorage.getItem('authToken');
     fetch(`${uri}/${itemId}`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
+            'Authorization': 'Bearer ' + authToken,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(item)
