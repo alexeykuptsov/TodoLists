@@ -8,6 +8,10 @@ The purpose of the project is practicing with programming languages, technologie
 
 ## Getting Started
 
+_(to be implemented)_
+
+Unpack ZIP-archive.
+
 To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
 https://localhost:7147 in a browser.
 
@@ -42,7 +46,7 @@ We use classic merges and avoid rebasing, amend-committing and other Git command
 
 The following personas are used in user stories bug tracking and implementation of manual and automated tests.
 
-*Kevin* uses To-Do Lists app hlsted on his local machine.
+*Kevin* uses To-Do Lists app hosted on his local machine.
 His OS is Windows.
 He installs the app by unpacking a ZIP distributive and following section Getting Started.
 
