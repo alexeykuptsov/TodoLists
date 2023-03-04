@@ -17,7 +17,7 @@ Kanban board: https://github.com/users/alexeykuptsov/projects/1/views/1
 
 ### After-Checkout Development Environment Setup
 
-Install Postgres 14.
+Install Postgres 14, .NET 7 and JetBrains Rider (as a default IDE for this project).
 
 ```shell
 dotnet tool install --global dotnet-ef
