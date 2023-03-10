@@ -10,7 +10,7 @@ The purpose of the project is practicing with programming languages, technologie
 
 _(to be implemented)_
 
-Unpack ZIP-archive.
+Download and unpack ZIP-archive.
 
 To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
 https://localhost:7147 in a browser.
@@ -35,6 +35,10 @@ create user todo_lists_app password 'pass' createdb;
 cd App
 dotnet ef database update
 ```
+
+Also you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refers to folder `pgsql` of unarchived
+[Postgres ZIP distributive](https://www.enterprisedb.com/download-postgresql-binaries).
+For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
 ### Branching strategy
 
