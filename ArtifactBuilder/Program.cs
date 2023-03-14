@@ -1,4 +1,5 @@
-﻿using TodoLists.ArtifactBuilder;
+﻿using System.Diagnostics;
+using TodoLists.ArtifactBuilder;
 
 var solutionDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../../.."));
 
@@ -23,6 +24,15 @@ if (Directory.Exists(launcherDir))
     Directory.Delete(launcherDir, true);
 new DirectoryInfo(Path.Combine(solutionDir, "Launcher/bin/Debug/net7.0-windows")).CopyTo(launcherDir);
 
-throw new NotImplementedException("We should implement archiving bin to ZIP.");
+var artifactsDir = Path.Combine(solutionDir, "artifacts");
+if (Directory.Exists(artifactsDir))
+    Directory.Delete(artifactsDir, true);
+Directory.CreateDirectory(artifactsDir);
 
-// Console.WriteLine($"Success. Solution dir: {solutionDir}");
+var process = Process.Start(new ProcessStartInfo
+{
+    FileName = "7z",
+    Arguments = "a artifacts/TodoLists.zip bin/*",
+    WorkingDirectory = solutionDir,
+});
+await process!.WaitForExitAsync();
