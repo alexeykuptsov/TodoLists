@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
-    <div class="dx-viewport">
+    <div class="dx-viewport" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%;">
         <div id="vapp">
             <user-panel v-show="userName != null"></user-panel>
             <login-button v-show="userName == null"></login-button>

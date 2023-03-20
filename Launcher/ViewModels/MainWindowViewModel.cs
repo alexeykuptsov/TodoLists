@@ -11,57 +11,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly Process myPostgresProcess;
     private string myTodoListsAppStatusText;
-    private string myPostgresStatusText;
 
-    public MainWindowViewModel(Process todoListsAppProcess, Process postgresProcess)
+    public MainWindowViewModel(Process todoListsAppProcess)
     {
-        myPostgresProcess = postgresProcess;
         todoListsAppProcess.Exited += (_, _) =>
         {
             TodoListsAppStatusText = "TodoLists.App не работает";
         };
         myTodoListsAppStatusText = todoListsAppProcess.HasExited ? "TodoLists.App не работает" : "TodoLists.App OK";
-
-        postgresProcess.Exited += (_, _) =>
-        {
-            UpdatePostgresStatusText();
-        };
-        UpdatePostgresStatusText();
-    }
-
-    private void UpdatePostgresStatusText()
-    {
-        if (!myPostgresProcess.HasExited)
-        {
-            PostgresStatusText = "PostgreSQL OK";
-            return;
-        }
-
-        StringBuilder resultBuilder = new StringBuilder();
-        resultBuilder.AppendLine("PostgreSQL не работает");
-        try
-        {
-            resultBuilder.AppendLine("stderr: " + myPostgresProcess.StandardError.ReadToEnd());
-        }
-        catch (InvalidOperationException e)
-        {
-            resultBuilder.AppendLine("stderr: " + e.Message);
-        }
-        try
-        {
-            resultBuilder.AppendLine("stdout: " + myPostgresProcess.StandardOutput.ReadToEnd());
-        }
-        catch (InvalidOperationException e)
-        {
-            resultBuilder.AppendLine("stdout: " + e.Message);
-        }
-        PostgresStatusText = resultBuilder.ToString();
-    }
-
-    public string PostgresStatusText
-    {
-        get => myPostgresStatusText;
-        set => SetField(ref myPostgresStatusText, value);
     }
 
     public string TodoListsAppStatusText

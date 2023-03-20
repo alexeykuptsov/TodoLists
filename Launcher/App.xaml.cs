@@ -16,7 +16,7 @@ namespace WpfApp
     public partial class App
     {
         private Process? myTodoListsAppProcess;
-        private Process? myPostgresProcess;
+        private Process? myPgCtlProcess;
         
         protected override void OnStartup(StartupEventArgs e)
         { 
@@ -110,7 +110,7 @@ namespace WpfApp
                 }
 
                 var pgCtlArguments = $"-o \"-p 41577\" -D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start";
-                myPostgresProcess = Process.Start(new ProcessStartInfo
+                myPgCtlProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = Path.Combine(postgresWorkingDir, "pg_ctl.exe"),
                     Arguments = pgCtlArguments,
@@ -133,13 +133,12 @@ namespace WpfApp
         {
             base.OnActivated(e);
 
-            MainWindow!.DataContext = new MainWindowViewModel(myTodoListsAppProcess!, myPostgresProcess!);
+            MainWindow!.DataContext = new MainWindowViewModel(myTodoListsAppProcess!);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             myTodoListsAppProcess?.Kill();
-            myPostgresProcess?.Kill();
 
             if (e.ApplicationExitCode == 0)
                 Log.Information("Exited gracefully");
