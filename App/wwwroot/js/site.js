@@ -3,6 +3,11 @@ let todos = [];
 
 function refreshPageData() {
     let authToken = localStorage.getItem('authToken');
+    
+    if (authToken === null) {
+        throw new Error('Unexpected auth token value. It is asserted that it is not null.');
+    }
+
     fetch(uri, {
         headers: {
             'Authorization': 'Bearer ' + authToken,
@@ -16,7 +21,32 @@ function refreshPageData() {
         })
         .then(data => _displayItems(data))
         .catch(error => {
-            DevExpress.ui.notify('Unable to get items.', error.message)
+            if (error.message === 'HTTP status 401') {
+                localStorage.removeItem('authToken');
+                window.location.reload();
+            }
+            
+            let toastMessage = 'Unknown error on loading items. ' + error.message;
+            let notifyToastOptions = {
+                type: 'error',
+                displayTime: 5000,
+                contentTemplate(element) {
+                    const $rootDiv = $('<div>')
+
+                    const $text = $('<div>').text(toastMessage);
+                    $rootDiv.append($text);
+
+                    const $copyLink = $('<a>')
+                        .attr('href', '#')
+                        .attr('onclick', `navigator.clipboard.writeText(${toastMessage});`)
+                        .attr('style', 'color: #99ddff;')
+                        .text('Копировать текст ошибки');
+                    $rootDiv.append($copyLink);
+
+                    element.append($rootDiv);
+                }
+            };
+            DevExpress.ui.notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
         });
 }
 
@@ -151,11 +181,12 @@ function _displayItems(data) {
 
 let vueApp;
 
-$(() => {
+function initPage() {
     Vue.component('UserPanel', {
-        data: function() {
+        data: function () {
             return {
                 userName: this.$root.userName,
+                foo: 'bar',
             }
         },
         template:
@@ -172,7 +203,8 @@ $(() => {
                     <div id="login-form"></div>
                     <div id="login-button"></div>
                 </div>
-            </div>`
+            </div>`,
+        
     });
     Vue.component('MainPanel', {
         template:
@@ -251,7 +283,7 @@ $(() => {
     if (previouslyEnteredProfile !== null) {
         loginFormData.profile = previouslyEnteredProfile
     }
-    
+
     const loginForm = $('#login-form').dxForm({
         colCount: 2,
         labelMode: 'floating',
@@ -290,7 +322,7 @@ $(() => {
             }],
         }],
     }).dxForm('instance');
-    
+
     $('#login-button').dxButton({
         stylingMode: 'contained',
         text: 'Войти',
@@ -303,7 +335,7 @@ $(() => {
                 DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
                 return;
             }
-            
+
             localStorage.setItem('loginForm.profile', userDto.profile);
 
             fetch('https://localhost:7147/api/Auth/Login', {
@@ -342,5 +374,13 @@ $(() => {
 
     if (userName !== null) {
         refreshPageData();
+    }
+}
+
+$(() => {
+    try {
+        initPage();
+    } catch (e) {
+        DevExpress.ui.notify(e.toString() + '\n', 'error', 5000);
     }
 });

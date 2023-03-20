@@ -16,7 +16,7 @@ namespace WpfApp
     public partial class App
     {
         private Process? myTodoListsAppProcess;
-        private Process? myPostgresProcess;
+        private Process? myPgCtlProcess;
         
         protected override void OnStartup(StartupEventArgs e)
         { 
@@ -50,9 +50,22 @@ namespace WpfApp
                 };
 
                 var wpfAppDirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+
+                var environmentIsDevelopment = Environment.GetEnvironmentVariable("Environment") == "Development";
                 
-                var webAppWorkingDir = Path.Combine(wpfAppDirPath, "../../../../App");
-                var webAppExePath = Path.Combine(webAppWorkingDir, "bin/Debug/net7.0/TodoLists.App.exe");
+                string webAppWorkingDir;
+                string webAppExePath;
+                if (environmentIsDevelopment)
+                {
+                    webAppWorkingDir = Path.Combine(wpfAppDirPath, "../../../../App");
+                    webAppExePath = Path.Combine(webAppWorkingDir, "bin/Debug/net7.0/TodoLists.App.exe");
+                }
+                else
+                {
+                    webAppWorkingDir = Path.Combine(wpfAppDirPath, "../App");
+                    webAppExePath = Path.Combine(webAppWorkingDir, "TodoLists.App.exe");
+                }
+
                 myTodoListsAppProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = webAppExePath,
@@ -63,8 +76,19 @@ namespace WpfApp
                     CreateNoWindow = true,
                 });
                 
-                var postgresWorkingDir = Path.Combine(wpfAppDirPath, "../../../../pgsql/bin");
-                var postgresDataDir = Path.Combine(wpfAppDirPath, "../../../../data");
+                string postgresWorkingDir;
+                string postgresDataDir;
+                if (environmentIsDevelopment)
+                {
+                    postgresWorkingDir = Path.Combine(wpfAppDirPath, "../../../../pgsql/bin");
+                    postgresDataDir = Path.Combine(wpfAppDirPath, "../../../../data");
+                }
+                else
+                {
+                    postgresWorkingDir = Path.Combine(wpfAppDirPath, "../pgsql/bin");
+                    postgresDataDir = Path.Combine(wpfAppDirPath, "../data");
+                }
+
                 if (!Directory.Exists(postgresDataDir))
                 {
                     Directory.CreateDirectory(postgresDataDir);
@@ -86,7 +110,7 @@ namespace WpfApp
                 }
 
                 var pgCtlArguments = $"-o \"-p 41577\" -D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start";
-                myPostgresProcess = Process.Start(new ProcessStartInfo
+                myPgCtlProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = Path.Combine(postgresWorkingDir, "pg_ctl.exe"),
                     Arguments = pgCtlArguments,
@@ -109,13 +133,12 @@ namespace WpfApp
         {
             base.OnActivated(e);
 
-            MainWindow!.DataContext = new MainWindowViewModel(myTodoListsAppProcess!, myPostgresProcess!);
+            MainWindow!.DataContext = new MainWindowViewModel(myTodoListsAppProcess!);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             myTodoListsAppProcess?.Kill();
-            myPostgresProcess?.Kill();
 
             if (e.ApplicationExitCode == 0)
                 Log.Information("Exited gracefully");
