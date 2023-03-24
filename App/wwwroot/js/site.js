@@ -38,7 +38,7 @@ function refreshPageData() {
 
                     const $copyLink = $('<a>')
                         .attr('href', '#')
-                        .attr('onclick', `navigator.clipboard.writeText(${toastMessage});`)
+                        .attr('onclick', `navigator.clipboard.writeText('${toastMessage}');`)
                         .attr('style', 'color: #99ddff;')
                         .text('Копировать текст ошибки');
                     $rootDiv.append($copyLink);
