@@ -21,7 +21,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.UseSerilog();
-    
+
     builder.Services.AddControllers();
     builder.Services.AddDbContext<TodoContext>(options =>
     {
@@ -43,7 +43,8 @@ try
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     });
 
-    var jwtKey = builder.Configuration.GetSection("AppSettings:JwtKey").Value ?? throw new ConfigurationErrorsException("Required configuration option AppSettings:JwtKey is not set.");
+    var jwtKey = builder.Configuration.GetSection("AppSettings:JwtKey").Value ??
+                 throw new ConfigurationErrorsException("Required configuration option AppSettings:JwtKey is not set.");
 
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
@@ -78,6 +79,10 @@ try
 
     app.Run();
 }
+catch (HostAbortedException)
+{
+    Log.Information("Ignored HostAbortedException");
+}
 catch (Exception ex)
 {
     Log.Fatal(ex, "Failed to init the application");
@@ -88,3 +93,4 @@ finally
 }
 
 Log.Information("Exited gracefully.");
+
