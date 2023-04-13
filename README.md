@@ -59,7 +59,7 @@ He installs the app by unpacking a ZIP distributive and following section Gettin
 #### Drop and Create
 
 ⚠
-The following script runs `database drop` so you need not close all connections to database `todo_lists`.
+The following script runs `database drop` so you need to close all connections to database `todo_lists`.
 
 ```shell
 PS> cd App
@@ -72,7 +72,7 @@ Before version 1.0.0 the last migration is the single one.
 So the script shall be improved after the release.
 
 ⚠
-The following script runs `database drop` so you need not close all connections to database `todo_lists`.
+The following script runs `database drop` so you need to close all connections to database `todo_lists`.
 
 ```shell
 PS> cd App
