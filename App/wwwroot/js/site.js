@@ -47,6 +47,7 @@ function refreshPageData() {
                 }
             };
             DevExpress.ui.notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
+            throw error;
         });
 }
 
@@ -182,11 +183,36 @@ function _displayItems(data) {
 let vueApp;
 
 function initPage() {
-    Vue.component('UserPanel', {
+    let authToken = localStorage.getItem('authToken');
+    let userName = null;
+    if (authToken !== null) {
+        try {
+            let authTokenJson = JSON.parse(atob(authToken.split('.')[1]));
+            userName = authTokenJson['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+        } catch (e) {
+            localStorage.removeItem('authToken')
+            authToken = null;
+        }
+    }
+    vueApp = Vue.createApp({
+        data() {
+            return {
+                display: 'redbox',
+                userName: userName,
+            };
+        },
+        methods: {
+            logout() {
+                localStorage.removeItem("authToken");
+                this.isAuthenticated = false;
+                document.location.reload();
+            }
+        }
+    });
+    vueApp.component('UserPanel', {
         data: function () {
             return {
                 userName: this.$root.userName,
-                foo: 'bar',
             }
         },
         template:
@@ -195,7 +221,7 @@ function initPage() {
                 <a onclick="vueApp.logout();" href='#'>Выйти</a>
             </div>`
     });
-    Vue.component('LoginButton', {
+    vueApp.component('LoginButton', {
         template:
             `<div>
                 <a id="loginPopoverLink" style="cursor: pointer;">Войти</a>
@@ -204,9 +230,9 @@ function initPage() {
                     <div id="login-button"></div>
                 </div>
             </div>`,
-        
+
     });
-    Vue.component('MainPanel', {
+    vueApp.component('MainPanel', {
         template:
             `<div>
                 <h1>To-do CRUD</h1>
@@ -240,38 +266,14 @@ function initPage() {
                 </table>
             </div>`
     });
-    Vue.component('NoAccessPanel', {
+    vueApp.component('NoAccessPanel', {
         template:
             `<div>
                 <h1>Нет доступа</h1>
                 <div>Войдите, чтобы воспользоватться приложением.</div>
             </div>`
     });
-    let authToken = localStorage.getItem('authToken');
-    let userName = null;
-    if (authToken !== null) {
-        try {
-            let authTokenJson = JSON.parse(atob(authToken.split('.')[1]));
-            userName = authTokenJson['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-        } catch (e) {
-            localStorage.removeItem('authToken')
-            authToken = null;
-        }
-    }
-    vueApp = new Vue({
-        el: '#vapp',
-        data: {
-            display: 'redbox',
-            userName: userName,
-        },
-        methods: {
-            logout() {
-                localStorage.removeItem("authToken");
-                this.isAuthenticated = false;
-                document.location.reload();
-            }
-        }
-    });
+    vueApp.mount('#vapp');
 
     let loginFormData = {
         profile: null,
@@ -382,5 +384,6 @@ $(() => {
         initPage();
     } catch (e) {
         DevExpress.ui.notify(e.toString() + '\n', 'error', 5000);
+        throw e;
     }
 });
