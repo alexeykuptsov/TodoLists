@@ -1,5 +1,6 @@
 const uri = 'api/todoitems';
 let todos = [];
+let splitter;
 
 function refreshPageData() {
     let authToken = localStorage.getItem('authToken');
@@ -182,6 +183,11 @@ function _displayItems(data) {
 
 let vueApp;
 
+function adjustElementSizes() {
+    let height = Math.max(window.innerHeight - 130, 200);
+    splitter.height(height);
+}
+
 function initPage() {
     let authToken = localStorage.getItem('authToken');
     let userName = null;
@@ -233,37 +239,53 @@ function initPage() {
 
     });
     vueApp.component('MainPanel', {
+        data() {
+            return {
+                projects: [ 'Inbox', 'Project 1', 'Project 2'],
+            };
+        },
         template:
             `<div>
                 <h1>To-do CRUD</h1>
-                <h3>Add</h3>
-                <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
-                    <input type="text" id="add-name" placeholder="New to-do">
-                    <input type="submit" value="Add">
-                </form>
                 
-                <div id="editForm">
-                    <h3>Edit</h3>
-                    <form action="javascript:void(0);" onsubmit="updateItem()">
-                        <input type="hidden" id="edit-id">
-                        <input type="checkbox" id="edit-isComplete">
-                        <input type="text" id="edit-name">
-                        <input type="submit" value="Save">
-                        <a onclick="closeInput()" aria-label="Close">&#10006;</a>
-                    </form>
+                <div id="splitter-panel" class="splitter_panel">
+                    <div style="width: 100%;">
+                        <ul>
+                            <li v-for="project in projects">{{ project }}</li>                
+                        </ul>
+                    </div>
+                    <div style="width: 100%;">
+                        <h3>Add</h3>
+                                        
+                        <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
+                            <input type="text" id="add-name" placeholder="New to-do">
+                            <input type="submit" value="Add">
+                        </form>
+                        
+                        <div id="editForm">
+                            <h3>Edit</h3>
+                            <form action="javascript:void(0);" onsubmit="updateItem()">
+                                <input type="hidden" id="edit-id">
+                                <input type="checkbox" id="edit-isComplete">
+                                <input type="text" id="edit-name">
+                                <input type="submit" value="Save">
+                                <a onclick="closeInput()" aria-label="Close">&#10006;</a>
+                            </form>
+                        </div>
+                        
+                        <p id="counter"></p>
+                        
+                        <table>
+                            <tr>
+                                <th>Is Complete?</th>
+                                <th>Name</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            <tbody id="todos"></tbody>
+                        </table>
+                    </div>
                 </div>
-                
-                <p id="counter"></p>
-                
-                <table>
-                    <tr>
-                        <th>Is Complete?</th>
-                        <th>Name</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    <tbody id="todos"></tbody>
-                </table>
             </div>`
     });
     vueApp.component('NoAccessPanel', {
@@ -284,6 +306,24 @@ function initPage() {
     let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
     if (previouslyEnteredProfile !== null) {
         loginFormData.profile = previouslyEnteredProfile
+    }
+
+    const splitterPanelElement = $('#splitter-panel');
+    splitter = splitterPanelElement.width("100%").split({
+        orientation: 'vertical',
+        limit: {
+            leftUpper: 200,
+            rightBottom: 200
+        },
+        onDrag: function (event) {
+            localStorage.setItem('mainPage.splitterPosition', splitter.position());
+        }
+    });
+    const savedSplitterPositionString = localStorage.getItem('mainPage.splitterPosition');
+    if (savedSplitterPositionString !== null) {
+        splitter.position(parseFloat(savedSplitterPositionString));
+    } else {
+        splitter.position(splitter.width() * 0.5);
     }
 
     const loginForm = $('#login-form').dxForm({
@@ -373,6 +413,12 @@ function initPage() {
         shading: true,
         shadingColor: 'rgba(0, 0, 0, 0.5)',
     });
+
+    window.onresize = function(event) {
+        adjustElementSizes();
+    };
+
+    adjustElementSizes();
 
     if (userName !== null) {
         refreshPageData();
