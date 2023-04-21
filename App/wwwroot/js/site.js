@@ -181,8 +181,6 @@ function _displayItems(data) {
     todos = data;
 }
 
-let vueApp;
-
 function adjustElementSizes() {
     let height = Math.max(window.innerHeight - 130, 200);
     splitter.height(height);
@@ -200,7 +198,7 @@ function initPage() {
             authToken = null;
         }
     }
-    vueApp = Vue.createApp({
+    const vueApp = Vue.createApp({
         data() {
             return {
                 display: 'redbox',
@@ -210,13 +208,12 @@ function initPage() {
         methods: {
             logout() {
                 localStorage.removeItem("authToken");
-                this.isAuthenticated = false;
                 document.location.reload();
             }
         }
     });
     vueApp.component('UserPanel', {
-        data: function () {
+        data() {
             return {
                 userName: this.$root.userName,
             }
@@ -224,7 +221,7 @@ function initPage() {
         template:
             `<div>
                 <div style="display: inline-block;">{{ userName }}</div>
-                <a onclick="vueApp.logout();" href='#'>Выйти</a>
+                <a @click="this.$root.logout();" href='#'>Выйти</a>
             </div>`
     });
     vueApp.component('LoginButton', {
@@ -297,131 +294,131 @@ function initPage() {
     });
     vueApp.mount('#vapp');
 
-    let loginFormData = {
-        profile: null,
-        username: null,
-        password: null,
-    };
-
-    let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
-    if (previouslyEnteredProfile !== null) {
-        loginFormData.profile = previouslyEnteredProfile
-    }
-
-    const splitterPanelElement = $('#splitter-panel');
-    splitter = splitterPanelElement.width("100%").split({
-        orientation: 'vertical',
-        limit: {
-            leftUpper: 200,
-            rightBottom: 200
-        },
-        onDrag: function (event) {
-            localStorage.setItem('mainPage.splitterPosition', splitter.position());
-        }
-    });
-    const savedSplitterPositionString = localStorage.getItem('mainPage.splitterPosition');
-    if (savedSplitterPositionString !== null) {
-        splitter.position(parseFloat(savedSplitterPositionString));
-    } else {
-        splitter.position(splitter.width() * 0.5);
-    }
-
-    const loginForm = $('#login-form').dxForm({
-        colCount: 2,
-        labelMode: 'floating',
-        formData: loginFormData,
-        items: [{
-            dataField: 'profile',
-            label: 'Профиль',
-            validationRules: [{
-                type: 'required',
-            }],
-        }, {
-            dataField: 'username',
-            label: 'Логин',
-            editorOptions: {
-                inputAttr: {
-                    type: 'username',
-                    autocomplete: 'on',
-                },
-            },
-            validationRules: [{
-                type: 'required',
-            }],
-        }, {
-            dataField: 'password',
-            label: 'Пароль',
-            editorOptions: {
-                mode: 'password',
-                inputAttr: {
-                    type: 'password',
-                    autocomplete: 'on',
-                },
-            },
-            validationRules: [{
-                type: 'required',
-                message: 'Password is required',
-            }],
-        }],
-    }).dxForm('instance');
-
-    $('#login-button').dxButton({
-        stylingMode: 'contained',
-        text: 'Войти',
-        type: 'default',
-        width: 120,
-        onClick() {
-            let userDto = loginForm.option('formData');
-            let validationResult = loginForm.validate();
-            if (!validationResult.isValid) {
-                DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
-                return;
-            }
-
-            localStorage.setItem('loginForm.profile', userDto.profile);
-
-            fetch('https://localhost:7147/api/Auth/Login', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'text',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userDto),
-            })
-                .then(response => {
-                    if (response.status === 401) {
-                        DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
-                    }
-                    if (!response.ok) {
-                        throw new Error("HTTP status " + response.status);
-                    }
-                    return response.text();
-                })
-                .then(token => {
-                    localStorage.setItem('authToken', token);
-                    document.location.reload();
-                })
-                .catch(error => DevExpress.ui.notify('Не удалось войти.', error));
-        },
-    });
-
-    $('#loginPopover').dxPopover({
-        target: '#loginPopoverLink',
-        showEvent: 'dxclick',
-        position: 'bottom',
-        width: 500,
-        shading: true,
-        shadingColor: 'rgba(0, 0, 0, 0.5)',
-    });
-
-    window.onresize = function(event) {
-        adjustElementSizes();
-    };
-
-    adjustElementSizes();
-
     if (userName !== null) {
+        const splitterPanelElement = $('#splitter-panel');
+        splitter = splitterPanelElement.width("100%").split({
+            orientation: 'vertical',
+            limit: {
+                leftUpper: 200,
+                rightBottom: 200
+            },
+            onDrag: function (event) {
+                localStorage.setItem('mainPage.splitterPosition', splitter.position());
+            }
+        });
+        const savedSplitterPositionString = localStorage.getItem('mainPage.splitterPosition');
+        if (savedSplitterPositionString !== null) {
+            splitter.position(parseFloat(savedSplitterPositionString));
+        } else {
+            splitter.position(splitter.width() * 0.5);
+        }
+
+        window.onresize = function(event) {
+            adjustElementSizes();
+        };
+
+        adjustElementSizes();
+
         refreshPageData();
+    } else {
+        let loginFormData = {
+            profile: null,
+            username: null,
+            password: null,
+        };
+
+        let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
+        if (previouslyEnteredProfile !== null) {
+            loginFormData.profile = previouslyEnteredProfile
+        }
+
+        const loginForm = $('#login-form').dxForm({
+            colCount: 2,
+            labelMode: 'floating',
+            formData: loginFormData,
+            items: [{
+                dataField: 'profile',
+                label: 'Профиль',
+                validationRules: [{
+                    type: 'required',
+                }],
+            }, {
+                dataField: 'username',
+                label: 'Логин',
+                editorOptions: {
+                    inputAttr: {
+                        type: 'username',
+                        autocomplete: 'on',
+                    },
+                },
+                validationRules: [{
+                    type: 'required',
+                }],
+            }, {
+                dataField: 'password',
+                label: 'Пароль',
+                editorOptions: {
+                    mode: 'password',
+                    inputAttr: {
+                        type: 'password',
+                        autocomplete: 'on',
+                    },
+                },
+                validationRules: [{
+                    type: 'required',
+                    message: 'Password is required',
+                }],
+            }],
+        }).dxForm('instance');
+
+        $('#login-button').dxButton({
+            stylingMode: 'contained',
+            text: 'Войти',
+            type: 'default',
+            width: 120,
+            onClick() {
+                let userDto = loginForm.option('formData');
+                let validationResult = loginForm.validate();
+                if (!validationResult.isValid) {
+                    DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
+                    return;
+                }
+
+                localStorage.setItem('loginForm.profile', userDto.profile);
+
+                fetch('https://localhost:7147/api/Auth/Login', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'text',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userDto),
+                })
+                    .then(response => {
+                        if (response.status === 401) {
+                            DevExpress.ui.notify('Не удалось войти.', 'Проверьте введенные данные.');
+                        }
+                        if (!response.ok) {
+                            throw new Error("HTTP status " + response.status);
+                        }
+                        return response.text();
+                    })
+                    .then(token => {
+                        localStorage.setItem('authToken', token);
+                        document.location.reload();
+                    })
+                    .catch(error => DevExpress.ui.notify('Не удалось войти.', error));
+            },
+        });
+
+        $('#loginPopover').dxPopover({
+            target: '#loginPopoverLink',
+            showEvent: 'dxclick',
+            position: 'bottom',
+            width: 500,
+            shading: true,
+            shadingColor: 'rgba(0, 0, 0, 0.5)',
+        });
     }
 }
 
