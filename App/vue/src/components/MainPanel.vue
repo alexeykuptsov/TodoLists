@@ -12,10 +12,10 @@
       <pane min-size="20">
         <h3>Add</h3>
 
-        <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
+        <div>
           <input type="text" id="add-name" placeholder="New to-do">
-          <input type="submit" value="Add">
-        </form>
+          <button v-on:click="addItem">Add</button>
+        </div>
 
         <div id="editForm">
           <h3>Edit</h3>
