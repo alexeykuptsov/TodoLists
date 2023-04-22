@@ -33,4 +33,20 @@
       <Folder Include="Migrations" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="wwwroot\**" />
+    </ItemGroup>
+
 </Project>

@@ -3,6 +3,7 @@ using Serilog;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -69,6 +70,12 @@ try
 
     app.UseDefaultFiles();
     app.UseStaticFiles();
+    /*
+    app.UseStaticFiles(new StaticFileOptions()
+    {
+        FileProvider = new PhysicalFileProvider(@"C:\Code\ak\github\TodoLists\foo\hello-vue\dist"),
+    });
+    */
 
     app.UseHttpsRedirection();
 
