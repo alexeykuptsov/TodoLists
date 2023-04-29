@@ -3,8 +3,8 @@
     <div id="main-header">
       <h1>To-do CRUD</h1>
     </div>
-    <splitpanes id="main-splitpanes" class="default-theme" style="height: 400px">
-      <pane min-size="20">
+    <splitpanes id="main-splitpanes" class="default-theme">
+      <pane min-size="20" size="30">
         <ul>
           <li v-for="project in projects" :key="project">{{ project }}</li>
         </ul>
@@ -110,7 +110,7 @@ export default {
             addNameTextbox.value = '';
           })
           .catch(error => notify('Error: ' + error));
-    }
+    },
   }
 }
 
@@ -176,12 +176,11 @@ function refreshPageData() {
 }
 
 function adjustElementSizes() {
-
-  let topToolbarOffsetHeight = document.getElementById('top-toolbar').offsetHeight;
-  let mainHeaderOffsetHeight = document.getElementById('main-header').offsetHeight;
-  const mainSplitpanes = $('#main-splitpanes');
-  let height = Math.max(window.innerHeight - document.getElementById('main-splitpanes').getBoundingClientRect().top - 10, 200);
-  mainSplitpanes.css('height', height);
+  const paneElements = $('#main-splitpanes > .splitpanes__pane');
+  for (const paneElement of paneElements) {
+    const height = Math.max(window.innerHeight - paneElement.getBoundingClientRect().top, 200);
+    $(paneElement).css('height', height);
+  }
 }
 
 function deleteItem(id) {
