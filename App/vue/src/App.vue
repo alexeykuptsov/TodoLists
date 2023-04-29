@@ -22,12 +22,6 @@ export default {
   props: {
     userName: String,
   },
-  methods: {
-    logout() {
-      localStorage.removeItem("authToken");
-      document.location.reload();
-    }
-  }
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="display: inline-block;">{{ userName }}</div>
-    <a onclick="this.$root.logout();" href='#'>Выйти</a>
+    <a v-on:click="logout" href='#'>Выйти</a>
   </div>
 </template>
 
@@ -10,6 +10,12 @@ export default {
   name: 'UserPanel',
   props: {
     userName: String
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem("authToken");
+      document.location.reload();
+    }
   },
 }
 </script>
