@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="main-header">
-      <h1>To-do CRUD</h1>
+      <h1>To-Do Lits</h1>
     </div>
     <splitpanes id="main-splitpanes" class="default-theme">
       <pane min-size="20" size="30">
@@ -109,7 +109,7 @@ export default {
             refreshPageData();
             addNameTextbox.value = '';
           })
-          .catch(error => notify('Error: ' + error));
+          .catch(error => notify(error, 'error', 10_000));
     },
   }
 }

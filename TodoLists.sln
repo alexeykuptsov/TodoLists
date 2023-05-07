@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtifactBuilder", "ArtifactBuilder\ArtifactBuilder.csproj", "{6120FE94-984D-4375-B0BE-DD23932EF829}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration", "Tests.Integration\Tests.Integration.csproj", "{84B3ED7A-C3C7-45B4-BA63-E31D6A2E1027}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{6120FE94-984D-4375-B0BE-DD23932EF829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6120FE94-984D-4375-B0BE-DD23932EF829}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6120FE94-984D-4375-B0BE-DD23932EF829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84B3ED7A-C3C7-45B4-BA63-E31D6A2E1027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84B3ED7A-C3C7-45B4-BA63-E31D6A2E1027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84B3ED7A-C3C7-45B4-BA63-E31D6A2E1027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84B3ED7A-C3C7-45B4-BA63-E31D6A2E1027}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

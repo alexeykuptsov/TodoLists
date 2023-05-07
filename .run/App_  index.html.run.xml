@@ -1,5 +1,5 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="App: index.html" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
+  <configuration default="false" name="App:  index.html" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
     <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/App/App.csproj" />
     <option name="LAUNCH_PROFILE_TFM" value="net7.0" />
     <option name="LAUNCH_PROFILE_NAME" value="index.html" />
