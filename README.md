@@ -40,20 +40,6 @@ Also you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refer
 [Postgres ZIP distributive](https://www.enterprisedb.com/download-postgresql-binaries).
 For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
-### Branching strategy
-
-We use [Git Flow](http://danielkummer.github.io/git-flow-cheatsheet/index.html).
-
-We use classic merges and avoid rebasing, amend-committing and other Git commands that change history.
-
-### User Story Personas
-
-The following personas are used in user stories bug tracking and implementation of manual and automated tests.
-
-*Kevin* uses To-Do Lists app hosted on his local machine.
-His OS is Windows.
-He installs the app by unpacking a ZIP distributive and following section Getting Started.
-
 ### Working with Local Dev Database
 
 #### Drop and Create
@@ -69,7 +55,7 @@ PS> .\LocalDevScripts\Drop_Create.ps1
 #### Generate the Last Migration
 
 Before version 1.0.0 the last migration is the single one.
-So the script shall be improved after the release.
+So the script should be improved after the release.
 
 ⚠
 The following script runs `database drop` so you need to close all connections to database `todo_lists`.
@@ -78,3 +64,28 @@ The following script runs `database drop` so you need to close all connections t
 PS> cd App
 PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
 ```
+
+### Running in a Development Environment
+
+Debug configuration "App: index.html" (in Rider `Ctrl+F9`).
+
+To apply vue project settings run in Terminal (in Rider `Alt+F12``):
+
+```shell
+cd App/vue
+npm run buildDev --watch
+```
+
+### Branching strategy
+
+We use [Git Flow](http://danielkummer.github.io/git-flow-cheatsheet/index.html).
+
+We use classic merges and avoid rebasing, amend-committing and other Git commands that change history.
+
+### User Story Personas
+
+The following personas are used in user stories bug tracking and implementation of manual and automated tests.
+
+*Kevin* uses To-Do Lists app hosted on his local machine.
+His OS is Windows.
+He installs the app by unpacking a ZIP distributive and following section Getting Started.

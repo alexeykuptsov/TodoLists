@@ -25,9 +25,13 @@ public class SmokeTests
 
         wait.Until(d => d.FindElement(By.ClassName("dx-popup-content")));
 
-        var profileTextBoxElement = chromeDriver.FindElement(By.XPath("//input[@name='profile']"));
-        profileTextBoxElement.SendKeys("dev");
+        chromeDriver.FindElement(By.XPath("//input[@name='profile']")).SendKeys("dev");
+        chromeDriver.FindElement(By.XPath("//input[@name='username']")).SendKeys("user");
+        chromeDriver.FindElement(By.XPath("//input[@name='password']")).SendKeys("pass");
+        chromeDriver.FindElement(By.Id("login-button")).Click();
 
-        Assert.Pass();
+        wait.Until(d => d.FindElement(By.Id("se-user-name")));
+
+        Assert.AreEqual("user", chromeDriver.FindElement(By.Id("se-user-name")).Text);
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="display: inline-block;">{{ userName }}</div>
+    <div id="se-user-name" style="display: inline-block;">{{ userName }}</div>
     <a v-on:click="logout" href='#'>Выйти</a>
   </div>
 </template>
