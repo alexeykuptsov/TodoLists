@@ -15,9 +15,8 @@
         <package-json value="$PROJECT_DIR$/App/vue/package.json" />
         <command value="run" />
         <scripts>
-          <script value="build" />
+          <script value="buildDev" />
         </scripts>
-        <arguments value="--mode=development" />
         <node-interpreter value="project" />
         <envs />
       </option>

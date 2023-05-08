@@ -73,7 +73,7 @@ To apply vue project settings run in Terminal (in Rider `Alt+F12``):
 
 ```shell
 cd App/vue
-npm run buildDev --watch
+npm run buildDevWatch
 ```
 
 ### Branching strategy
