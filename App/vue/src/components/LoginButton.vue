@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a id="loginPopoverLink" style="cursor: pointer;">Войти</a>
+    <a id="loginPopoverLink" style="cursor: pointer;">Sign in</a>
     <div id="loginPopover">
       <div id="login-form"></div>
       <div id="login-button"></div>
@@ -47,13 +47,13 @@ function initPage(thisComponent) {
     formData: loginFormData,
     items: [{
       dataField: 'profile',
-      label: 'Профиль',
+      label: 'Profile',
       validationRules: [{
         type: 'required',
       }],
     }, {
       dataField: 'username',
-      label: 'Логин',
+      label: 'Username',
       editorOptions: {
         inputAttr: {
           type: 'username',
@@ -65,7 +65,7 @@ function initPage(thisComponent) {
       }],
     }, {
       dataField: 'password',
-      label: 'Пароль',
+      label: 'Password',
       editorOptions: {
         mode: 'password',
         inputAttr: {
@@ -82,14 +82,14 @@ function initPage(thisComponent) {
 
   new Button($('#login-button'), {
     stylingMode: 'contained',
-    text: 'Войти',
+    text: 'Sign in',
     type: 'default',
     width: 120,
     onClick() {
       let userDto = loginForm.option('formData');
       let validationResult = loginForm.validate();
       if (!validationResult.isValid) {
-        notify('Не удалось войти.', 'Проверьте введенные данные.');
+        notify('Failed to sign in.', 'Check credentials input and try again.');
         return;
       }
 
@@ -105,7 +105,7 @@ function initPage(thisComponent) {
       })
           .then(response => {
             if (response.status === 401) {
-              notify('Не удалось войти.', 'Проверьте введенные данные.');
+              notify('Failed to sign in.', 'Incorrect credentials input.');
             }
             if (!response.ok) {
               throw new Error("HTTP status " + response.status);
@@ -116,7 +116,7 @@ function initPage(thisComponent) {
             localStorage.setItem('authToken', token);
             document.location.reload();
           })
-          .catch(error => notify('Не удалось войти.', error));
+          .catch(error => notify('Failed to sign in.', error));
     },
   });
 

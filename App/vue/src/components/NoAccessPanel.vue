@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Нет доступа</h1>
-    <div>Войдите, чтобы воспользоватться приложением.</div>
+    <h1>To-Do Lits</h1>
+    <div>Sign in to use the app.</div>
   </div>
 </template>
 

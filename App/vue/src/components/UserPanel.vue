@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="se-user-name" style="display: inline-block;">{{ userName }}</div>
-    <a v-on:click="logout" href='#'>Выйти</a>
+    <a v-on:click="logout" href='#'>Sign out</a>
   </div>
 </template>
 
