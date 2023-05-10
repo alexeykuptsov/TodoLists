@@ -1,7 +1,7 @@
 ﻿# To-Do Lists
 
 To-Do Lists in just another appllication for managing tasks with lists of check boxes.
-The app is implemented as an web application (ASP.NET Core 7 + Vue.js + DevExtreme) with a PostgreSQL database behind.
+The app is implemented as an web application (ASP.NET Core + Vue.js + DevExtreme) with a PostgreSQL database behind.
 Also there is a WPF launcher which is used to run the app and the database on Windows (in the same manner as pgAdmin is run).
 
 The purpose of the project is practicing with programming languages, technologies and libraries used in the app implementation.
