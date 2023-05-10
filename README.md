@@ -40,6 +40,22 @@ Also you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refer
 [Postgres ZIP distributive](https://www.enterprisedb.com/download-postgresql-binaries).
 For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
+### Running in a Development Environment
+
+Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
+
+To apply vue project settings run in Terminal (`Alt+F12` in Rider):
+
+```shell
+cd App/vue
+npm run buildDevWatch
+```
+
+### Tests
+
+Integration tests (project `Tests.Integration`) are supposed to be run locally and the web app is running.
+For example, you may run configuration "App: index.html" and then run all tests from solution (`Ctrl+;,L` in Rider).
+
 ### Working with Local Dev Database
 
 #### Drop and Create
@@ -63,17 +79,6 @@ The following script runs `database drop` so you need to close all connections t
 ```shell
 PS> cd App
 PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
-```
-
-### Running in a Development Environment
-
-Debug configuration "App: index.html" (in Rider `Ctrl+F9`).
-
-To apply vue project settings run in Terminal (in Rider `Alt+F12``):
-
-```shell
-cd App/vue
-npm run buildDevWatch
 ```
 
 ### Branching strategy

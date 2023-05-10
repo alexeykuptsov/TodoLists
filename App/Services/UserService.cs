@@ -2,7 +2,7 @@
 
 public class UserService : IUserService
 {
-    public const string ProfileClaimType = "TodoListAppClaims/Profile";
+    public const string ProfileIdClaimType = "TodoListAppClaims/ProfileId";
     private readonly IHttpContextAccessor myHttpContextAccessor;
 
     public UserService(IHttpContextAccessor httpContextAccessor)
@@ -10,8 +10,9 @@ public class UserService : IUserService
         myHttpContextAccessor = httpContextAccessor;
     }
 
-    public string GetCurrentUserProfileName()
+    public long GetCurrentUserProfileId()
     {
-        return myHttpContextAccessor.HttpContext!.User.Claims.Single(x => x.Type == ProfileClaimType).Value;
+        var profileIdClaim = myHttpContextAccessor.HttpContext!.User.Claims.Single(x => x.Type == ProfileIdClaimType);
+        return long.Parse(profileIdClaim.Value);
     }
 }

@@ -25,6 +25,7 @@ public class TodoItemsController : ControllerBase
     public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems()
     {
         return await myContext.TodoItems
+            .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
             .Select(x => ItemToDto(x))
             .ToListAsync();
     }
@@ -86,7 +87,7 @@ public class TodoItemsController : ControllerBase
     {
         var todoItem = new TodoItem
         {
-            Profile = await myContext.Profiles.SingleAsync(x => x.Name == myUserService.GetCurrentUserProfileName()),
+            Profile = await myContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
             IsComplete = todoDto.IsComplete,
             Name = todoDto.Name,
         };

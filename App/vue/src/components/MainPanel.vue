@@ -14,7 +14,7 @@
 
         <div>
           <input type="text" id="add-name" placeholder="New to-do">
-          <button v-on:click="addItem">Add</button>
+          <button :class="{'se-add-todo-item-button': true}" v-on:click="addItem">Add</button>
         </div>
 
         <div id="editForm">

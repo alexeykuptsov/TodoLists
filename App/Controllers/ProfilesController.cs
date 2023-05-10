@@ -25,6 +25,12 @@ namespace TodoLists.App.Controllers
             return await myContext.Profiles.ToListAsync();
         }
 
+        [HttpGet("Count")]
+        public async Task<ActionResult> GetProfilesCount()
+        {
+            return Ok(await myContext.Profiles.CountAsync());
+        }
+
         // GET: api/Profiles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Profile>> GetProfile(long id)

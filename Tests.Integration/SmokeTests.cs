@@ -15,9 +15,9 @@ public class SmokeTests
     public void Test1()
     {
         using var chromeDriver = new ChromeDriver();
-        var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(1))
+        var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(2))
         {
-            PollingInterval = TimeSpan.FromMilliseconds(100),
+            PollingInterval = TimeSpan.FromMilliseconds(200),
         };
         chromeDriver.Url = "https://localhost:7147/";
         var loginPopoverLinkElement = chromeDriver.FindElement(By.Id("loginPopoverLink"));

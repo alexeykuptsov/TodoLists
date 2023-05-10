@@ -68,7 +68,7 @@ public class AuthController : Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, user.Username),
-            new(UserService.ProfileClaimType, user.Profile.Name),
+            new(UserService.ProfileIdClaimType, user.Profile.Id.ToString()),
         };
         return CreateToken(claims);
     }
