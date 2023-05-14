@@ -1,88 +1,54 @@
-using System.Collections.ObjectModel;
-using System.Net.Http.Headers;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using TodoLists.Tests.Integration.Arranging;
+using TodoLists.Tests.Integration.PageObject;
 
-namespace TodoLists.Tests.Integration;
-
-public class TodoItemsTests
+namespace TodoLists.Tests.Integration
 {
-    [Test]
-    public async Task AddTest01()
+    public class TodoItemsTests
     {
-        using var superUserHttpClient = new HttpClient();
-        superUserHttpClient.BaseAddress = new Uri("https://localhost:7147");
-        await AuthenticateSuperUser(superUserHttpClient);
-        var profileNumber = await GetProfilesCount(superUserHttpClient);
-        var profileName = "test" + profileNumber;
-        var username = "kevin";
-        await CreateProfile(profileName, superUserHttpClient);
-        await CreateUser(profileName, username, superUserHttpClient);
-
-        using var chromeDriver = new ChromeDriver();
-        var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(1))
+        [Test]
+        public async Task AddTest01()
         {
-            PollingInterval = TimeSpan.FromMilliseconds(200),
-        };
-        chromeDriver.Url = "https://localhost:7147/";
-        var loginPopoverLinkElement = chromeDriver.FindElement(By.Id("loginPopoverLink"));
-        loginPopoverLinkElement.Click();
+            var username = "kevin";
+            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
+            using var browser = new Browser();
+            var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            
+            mainPage.AddTodoItemNameInput.Text = "foo";
+            mainPage.AddTodoItemButton.Click();
+            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
+            
+            CollectionAssert.AreEqual(new [] {"foo"}, mainPage.TodoItemNames);
+        }
 
-        wait.Until(d => d.FindElement(By.ClassName("dx-popup-content")));
-
-        chromeDriver.FindElement(By.XPath("//input[@name='profile']")).SendKeys(profileName);
-        chromeDriver.FindElement(By.XPath("//input[@name='username']")).SendKeys(username);
-        chromeDriver.FindElement(By.XPath("//input[@name='password']")).SendKeys("pass");
-        chromeDriver.FindElement(By.Id("login-button")).Click();
-
-        wait.Until(d => d.FindElement(By.Id("se-user-name")));
-        
-        chromeDriver.FindElement(By.CssSelector("#add-name")).SendKeys("foo");
-        chromeDriver.FindElement(By.CssSelector(".se-add-todo-item-button")).Click();
-
-        ReadOnlyCollection<IWebElement>? todoItemNameElements = null;
-        wait.Until(d =>
+        [Test]
+        public async Task AddTest02()
         {
-            todoItemNameElements = d.FindElements(By.CssSelector(".dx-datagrid .dx-data-row td[aria-colindex='2']"));
-            return todoItemNameElements.Count == 1;
-        });
+            var username = "kevin";
+            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
+            using var browser = new Browser();
+            var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            
+            mainPage.AddTodoItemNameInput.Text = "foo";
+            mainPage.AddTodoItemButton.Click();
+            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
+            mainPage.AddTodoItemNameInput.Text = "bar";
+            mainPage.AddTodoItemButton.Click();
+            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 2);
+            
+            CollectionAssert.AreEqual(new [] {"foo", "bar"}, mainPage.TodoItemNames);
+        }
 
-        Assert.AreEqual("foo", todoItemNameElements![0].Text);
-    }
+        [Test]
+        public async Task UpdateSummaryTest01()
+        {
+            var username = "kevin";
+            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
+            using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
+            await TestDataBuilder.CreateTodoItemAsync("foo", httpClient);
+            using var browser = new Browser();
+            var mainPage = browser.OpenSiteAndLogin(profileName, username);
 
-    private static async Task CreateUser(string profileName, string username, HttpClient superUserHttpClient)
-    {
-        var content =
-            new StringContent($"{{\"profile\":\"{profileName}\",\"username\":\"{username}\",\"password\":\"pass\"}}");
-        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-        var response = await superUserHttpClient.PostAsync("api/Users/register", content);
-        response.EnsureSuccessStatusCode();
-    }
-
-    private static async Task<int> GetProfilesCount(HttpClient superUserHttpClient)
-    {
-        var response = await superUserHttpClient.GetAsync("api/Profiles/Count");
-        response.EnsureSuccessStatusCode();
-        var profileNumber = int.Parse(await response.Content.ReadAsStringAsync());
-        return profileNumber;
-    }
-
-    private static async Task CreateProfile(string profileName, HttpClient superUserHttpClient)
-    {
-        var content = new StringContent($"{{\"name\":\"{profileName}\"}}");
-        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-        var response = await superUserHttpClient.PostAsync("api/Profiles", content);
-        response.EnsureSuccessStatusCode();
-    }
-
-    private static async Task AuthenticateSuperUser(HttpClient superUserHttpClient)
-    {
-        var content = new StringContent("{\"username\":\"admin\",\"password\":\"pass\"}");
-        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-        var response = await superUserHttpClient.PostAsync("api/Auth/LoginSuperUser", content);
-        response.EnsureSuccessStatusCode();
-        var jwtToken = await response.Content.ReadAsStringAsync();
-        superUserHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+            throw new NotImplementedException();
+        }
     }
 }

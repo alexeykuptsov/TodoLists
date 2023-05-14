@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace TodoLists.App.Utils;
+namespace TodoLists.Utils;
 
 public static class Assertion
 {
