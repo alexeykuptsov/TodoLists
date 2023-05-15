@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 
 namespace TodoLists.Tests.Integration.PageObject;
 
@@ -7,11 +6,13 @@ public class MainBasePage : BasePage
 {
     public InputElement AddTodoItemNameInput { get; }
     public ButtonElement AddTodoItemButton { get; }
+    public DataGridElement TodoItemsDataGrid { get; }
 
     public MainBasePage(Browser browser) : base(browser)
     {
         AddTodoItemNameInput = new InputElement(Browser, new[] { By.CssSelector("#add-name") });
         AddTodoItemButton = new ButtonElement(Browser, new[] { By.CssSelector(".se-add-todo-item-button") });
+        TodoItemsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-todo-item-data-grid") });
     }
 
     public override void WaitUntilLoaded()

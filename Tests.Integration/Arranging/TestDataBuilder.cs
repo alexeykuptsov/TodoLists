@@ -24,10 +24,10 @@ public class TestDataBuilder
         return httpClient;
     }
 
-    public static async Task CreateTodoItemAsync(string todoItemName, HttpClient httpClient)
+    public static async Task CreateTodoItemAsync(string todoItemName, bool isComplete, HttpClient httpClient)
     {
         var content =
-            new StringContent($"{{\"name\":\"{todoItemName}\",\"isComplete\":false}}");
+            new StringContent($"{{\"name\":\"{todoItemName}\",\"isComplete\":{isComplete.ToString().ToLower()}}}");
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await httpClient.PostAsync("api/TodoItems", content);
         response.EnsureSuccessStatusCode();

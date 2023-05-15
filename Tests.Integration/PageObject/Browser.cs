@@ -40,4 +40,9 @@ public class Browser : IDisposable
         mainPage.WaitUntilLoaded();
         return mainPage;
     }
+
+    public void RefreshPage()
+    {
+        Driver.Url = Driver.Url;
+    }
 }

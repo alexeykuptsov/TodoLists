@@ -31,6 +31,7 @@
         <p id="counter"></p>
 
         <DxDataGrid
+            :class="{ 'se-todo-item-data-grid': true }"
             :ref="todoItemsDataGridRefKey"
             :data-source="todoItems"
             :remote-operations="false"
@@ -38,6 +39,10 @@
             :row-alternation-enabled="true"
             :show-borders="true"
         >
+          <DxEditing
+              :allow-updating="true"
+              mode="cell"
+          />
           <DxColumn data-field="isComplete" data-type="boolean" :width="40" />
           <DxColumn data-field="title" />
         </DxDataGrid>
@@ -51,7 +56,7 @@ import $ from 'jquery';
 import notify from 'devextreme/ui/notify';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import {DxDataGrid, DxColumn} from 'devextreme-vue/data-grid';
+import {DxDataGrid, DxColumn, DxEditing} from 'devextreme-vue/data-grid';
 import ArrayStore from 'devextreme/data/array_store';
 import DataSource from 'devextreme/data/data_source';
 
@@ -67,6 +72,7 @@ export default {
     Pane,
     DxDataGrid,
     DxColumn,
+    DxEditing,
   },
   data() {
     return {

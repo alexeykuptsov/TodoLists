@@ -44,10 +44,14 @@ namespace TodoLists.Tests.Integration
             var username = "kevin";
             var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
             using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
-            await TestDataBuilder.CreateTodoItemAsync("foo", httpClient);
+            await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
 
+            mainPage.TodoItemsDataGrid.Rows[0].Cells[0].Click();
+            browser.RefreshPage();
+                
+            // Assert.IsTrue(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked);
             throw new NotImplementedException();
         }
     }
