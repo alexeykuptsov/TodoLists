@@ -49,10 +49,10 @@ namespace TodoLists.Tests.Integration
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
 
             mainPage.TodoItemsDataGrid.Rows[0].Cells[0].Click();
-            browser.RefreshPage();
+            mainPage.RefreshPage();
+            await Task.Delay(TimeSpan.FromSeconds(1));
                 
-            // Assert.IsTrue(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked);
-            throw new NotImplementedException();
+            Assert.IsTrue(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked);
         }
     }
 }

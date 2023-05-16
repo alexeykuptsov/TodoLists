@@ -19,4 +19,10 @@ public class BasePage
             return documentReadyState == "complete";
         });
     }
+    
+    public void RefreshPage()
+    {
+        Browser.Driver.Url = Browser.Driver.Url;
+        WaitUntilLoaded();
+    }
 }

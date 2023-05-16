@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 
@@ -112,7 +114,33 @@ public class TodoItemsController : ControllerBase
         myContext.TodoItems.Remove(todoItem);
         await myContext.SaveChangesAsync();
 
-        return NoContent();
+        return Ok();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> PatchTodoItem([FromBody] dynamic body)
+    {
+        foreach (dynamic change in body.EnumerateArray())
+        {
+            long id = change.GetProperty("key").GetProperty("id").GetInt64();
+            foreach (dynamic property in change.GetProperty("data").EnumerateObject())
+            {
+                string propertyName = property.Name;
+                if (propertyName == "isComplete")
+                {
+                    bool propertyValue = property.Value.GetBoolean();
+                    await myContext.TodoItems.Where(x => x.Id == id).
+                        ExecuteUpdateAsync(x => x.SetProperty(t => t.IsComplete, propertyValue));
+                }
+                if (propertyName == "title")
+                {
+                    string propertyValue = property.Value.GetString();
+                    await myContext.TodoItems.Where(x => x.Id == id).
+                        ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
+                }
+            }
+        }
+        return Ok();
     }
 
     private bool TodoItemExists(long id)

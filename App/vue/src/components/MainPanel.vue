@@ -38,6 +38,7 @@
             :allow-column-reordering="true"
             :row-alternation-enabled="true"
             :show-borders="true"
+            @saving="onSaving"
         >
           <DxEditing
               :allow-updating="true"
@@ -85,7 +86,7 @@ export default {
           data: this.todoItems,
         }),
       }),
-      uri: 'api/todoitems',
+      uri: 'api/TodoItems',
 
     };
   },
@@ -201,6 +202,14 @@ export default {
       let authToken = localStorage.getItem('authToken');
       fetch(`${this.uri}/${id}`, {method: 'DELETE', headers: {'Authorization': 'Bearer ' + authToken}})
           .then(() => this.refreshPageData())
+          .catch(error => console.error('Unable to delete item.', error));
+    },
+    onSaving(e) {
+      fetch(this.uri, {
+        method: 'PATCH',
+        headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify(e.changes),        
+      })
           .catch(error => console.error('Unable to delete item.', error));
     },
     _displayItems(data) {
