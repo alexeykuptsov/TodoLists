@@ -12,7 +12,7 @@ public class Browser : IDisposable
     public Browser()
     {
         Driver = new ChromeDriver();
-        Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(1))
+        Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3))
         {
             PollingInterval = TimeSpan.FromMilliseconds(200),
         };

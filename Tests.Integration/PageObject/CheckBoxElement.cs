@@ -8,11 +8,10 @@ public class CheckBoxElement : BaseElement
     {
     }
 
-    public bool Checked
+    public bool Checked => FindElementByChain().GetAttribute("aria-checked") == "true";
+
+    public void Click()
     {
-        get
-        {
-            return FindElementByChain().GetAttribute("aria-checked") == "true";
-        }
+        FindElementByChain().Click();
     }
 }

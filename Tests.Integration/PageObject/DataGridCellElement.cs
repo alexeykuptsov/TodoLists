@@ -8,6 +8,8 @@ public class DataGridCellElement : BaseElement
     {
     }
 
+    public string Text => FindElementByChain().Text;
+
     public void Click()
     {
         FindElementByChain().Click();
@@ -16,5 +18,10 @@ public class DataGridCellElement : BaseElement
     public CheckBoxElement AsCheckBox()
     {
         return new CheckBoxElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-checkbox")));
+    }
+
+    public TextBoxElement AsTextBox()
+    {
+        return new TextBoxElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-textbox input")));
     }
 }

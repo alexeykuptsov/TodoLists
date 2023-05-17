@@ -1,3 +1,4 @@
+using OpenQA.Selenium;
 using TodoLists.Tests.Integration.Arranging;
 using TodoLists.Tests.Integration.PageObject;
 
@@ -13,11 +14,11 @@ namespace TodoLists.Tests.Integration
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
             
-            mainPage.AddTodoItemNameInput.Text = "foo";
+            mainPage.AddTodoItemNameTextBox.Text = "foo";
             mainPage.AddTodoItemButton.Click();
             browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
             
-            CollectionAssert.AreEqual(new [] {"foo"}, mainPage.TodoItemNames);
+            Assert.That(mainPage.TodoItemNames, Is.EqualTo(new [] {"foo"}));
         }
 
         [Test]
@@ -28,18 +29,18 @@ namespace TodoLists.Tests.Integration
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
             
-            mainPage.AddTodoItemNameInput.Text = "foo";
+            mainPage.AddTodoItemNameTextBox.Text = "foo";
             mainPage.AddTodoItemButton.Click();
             browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
-            mainPage.AddTodoItemNameInput.Text = "bar";
+            mainPage.AddTodoItemNameTextBox.Text = "bar";
             mainPage.AddTodoItemButton.Click();
             browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 2);
             
-            CollectionAssert.AreEqual(new [] {"foo", "bar"}, mainPage.TodoItemNames);
+            Assert.That(mainPage.TodoItemNames, Is.EqualTo(new [] {"foo", "bar"}));
         }
 
         [Test]
-        public async Task UpdateSummaryTest01()
+        public async Task UpdateTest01()
         {
             var username = "kevin";
             var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
@@ -47,12 +48,33 @@ namespace TodoLists.Tests.Integration
             await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            await Task.Delay(TimeSpan.FromSeconds(1));
 
-            mainPage.TodoItemsDataGrid.Rows[0].Cells[0].Click();
+            mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Click();
             mainPage.RefreshPage();
             await Task.Delay(TimeSpan.FromSeconds(1));
                 
-            Assert.IsTrue(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked);
+            Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
+        }
+
+        [Test]
+        public async Task UpdateTest02()
+        {
+            var username = "kevin";
+            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
+            using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
+            await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
+            using var browser = new Browser();
+            var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Click();
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            mainPage.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox().Text = "bar";
+            mainPage.RefreshPage();
+            await Task.Delay(TimeSpan.FromSeconds(1));
+                
+            Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Text, Is.EqualTo("bar"));
         }
     }
 }

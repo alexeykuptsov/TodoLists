@@ -4,13 +4,13 @@ namespace TodoLists.Tests.Integration.PageObject;
 
 public class MainBasePage : BasePage
 {
-    public InputElement AddTodoItemNameInput { get; }
+    public TextBoxElement AddTodoItemNameTextBox { get; }
     public ButtonElement AddTodoItemButton { get; }
     public DataGridElement TodoItemsDataGrid { get; }
 
     public MainBasePage(Browser browser) : base(browser)
     {
-        AddTodoItemNameInput = new InputElement(Browser, new[] { By.CssSelector("#add-name") });
+        AddTodoItemNameTextBox = new TextBoxElement(Browser, new[] { By.CssSelector("#add-name") });
         AddTodoItemButton = new ButtonElement(Browser, new[] { By.CssSelector(".se-add-todo-item-button") });
         TodoItemsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-todo-item-data-grid") });
     }
@@ -18,7 +18,7 @@ public class MainBasePage : BasePage
     public override void WaitUntilLoaded()
     {
         base.WaitUntilLoaded();
-        Browser.Wait.Until(d => d.FindElement(By.Id("se-user-name")));
+        Browser.Wait.Until(d => d.FindElements(By.Id("se-user-name")).Count > 0);
     }
 
     public List<string> TodoItemNames => Browser.Driver
