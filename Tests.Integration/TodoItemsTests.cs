@@ -1,4 +1,3 @@
-using OpenQA.Selenium;
 using TodoLists.Tests.Integration.Arranging;
 using TodoLists.Tests.Integration.PageObject;
 
@@ -48,11 +47,11 @@ namespace TodoLists.Tests.Integration
             await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
 
             mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Click();
             mainPage.RefreshPage();
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
                 
             Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
         }
@@ -66,13 +65,14 @@ namespace TodoLists.Tests.Integration
             await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
-            await Task.Delay(TimeSpan.FromSeconds(1));
-
-            mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Click();
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
+            
+            var row = mainPage.TodoItemsDataGrid.Rows[0];
+            row.Cells[1].Click();
+            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox());
             mainPage.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox().Text = "bar";
             mainPage.RefreshPage();
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
                 
             Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Text, Is.EqualTo("bar"));
         }

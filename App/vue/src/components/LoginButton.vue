@@ -128,6 +128,8 @@ function initPage(thisComponent) {
     shading: true,
     shadingColor: 'rgba(0, 0, 0, 0.5)',
   });
+    
+  document.getElementById('se-ajax-load-status').innerText = 'complete';
 }
 
 </script>

@@ -17,17 +17,6 @@
           <button :class="{'se-add-todo-item-button': true}" v-on:click="addItem">Add</button>
         </div>
 
-        <div id="editForm">
-          <h3>Edit</h3>
-          <form action="javascript:void(0);" onsubmit="updateItem()">
-            <input type="hidden" id="edit-id">
-            <input type="checkbox" id="edit-isComplete">
-            <input type="text" id="edit-name">
-            <input type="submit" value="Save">
-            <a onclick="closeInput()" aria-label="Close">&#10006;</a>
-          </form>
-        </div>
-
         <p id="counter"></p>
 
         <DxDataGrid
@@ -98,13 +87,8 @@ export default {
   mounted() {
     this.$nextTick(function () {
       try {
-        $('#todo-items-data-grid')
-        
+        this.refreshPageData();
         adjustElementSizes();
-
-        if (this.userName !== null) {
-          this.refreshPageData();
-        }
       } catch (e) {
         notify(e.toString() + '\n', 'error', 5000);
         throw e;
@@ -224,7 +208,10 @@ export default {
         });
       });
     
-      this.todoItemsDataGrid.refresh();
+      this.todoItemsDataGrid.refresh()
+          .done(() => {
+              document.getElementById('se-ajax-load-status').innerText = 'complete';
+          });
     },
   }
 }

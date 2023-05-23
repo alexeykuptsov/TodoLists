@@ -16,7 +16,16 @@ public class BasePage
         Browser.Wait.Until(d =>
         {
             var documentReadyState = (string)((IJavaScriptExecutor)d).ExecuteScript("return document.readyState");
-            return documentReadyState == "complete";
+            string ajaxReadyState;
+            try
+            {
+                ajaxReadyState = d.FindElement(By.Id("se-ajax-load-status")).GetAttribute("textContent");
+            }
+            catch (StaleElementReferenceException)
+            {
+                return false;
+            }
+            return documentReadyState == "complete" && ajaxReadyState == "complete";
         });
     }
     

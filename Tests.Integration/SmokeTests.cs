@@ -15,7 +15,7 @@ public class SmokeTests
     public void Test1()
     {
         using var chromeDriver = new ChromeDriver();
-        var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(2))
+        var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(3))
         {
             PollingInterval = TimeSpan.FromMilliseconds(200),
         };
@@ -32,6 +32,7 @@ public class SmokeTests
 
         wait.Until(d => d.FindElement(By.Id("se-user-name")));
 
-        Assert.AreEqual("user", chromeDriver.FindElement(By.Id("se-user-name")).Text);
+        
+        Assert.That(chromeDriver.FindElement(By.Id("se-user-name")).Text, Is.EqualTo("user"));
     }
 }

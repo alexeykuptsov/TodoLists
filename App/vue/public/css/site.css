@@ -2,10 +2,6 @@ input[type='submit'], button, [aria-label] {
     cursor: pointer;
 }
 
-#editForm {
-    display: none;
-}
-
 table {
     font-family: Arial, sans-serif;
     border: 1px solid;
