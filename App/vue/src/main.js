@@ -13,9 +13,6 @@ if (authToken !== null) {
     }
 }
 
-// Vue.loadScript('lib/jquery-3.5.1/js/jquery-3.5.1.min.js');
-// Vue.loadScript('lib/dx-22.1.6/js/dx.all.js');
-
 const data = {
     userName: userName,
 };

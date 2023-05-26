@@ -207,11 +207,11 @@ export default {
           isComplete: item.isComplete,
         });
       });
-    
+
       this.todoItemsDataGrid.refresh()
-          .done(() => {
-              document.getElementById('se-ajax-load-status').innerText = 'complete';
-          });
+        .done(() => {
+          document.getElementById('se-ajax-load-status').innerText = 'complete';
+        });
     },
   }
 }
