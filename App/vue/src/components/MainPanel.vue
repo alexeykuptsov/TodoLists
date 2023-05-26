@@ -5,13 +5,27 @@
     </div>
     <splitpanes id="main-splitpanes" class="default-theme">
       <pane min-size="20" size="30">
-        <ul>
-          <li v-for="project in projects" :key="project">{{ project }}</li>
-        </ul>
+        <h3>Projects</h3>
+
+        <DxDataGrid
+          :class="{ 'se-projects-data-grid': true }"
+          :ref="projectsDataGridRefKey"
+          :data-source="projects"
+          :remote-operations="false"
+          :allow-column-reordering="true"
+          :row-alternation-enabled="true"
+          :show-borders="true"
+          :show-column-headers="false"
+          @saving="onSaving"
+        >
+          <DxEditing
+            :allow-updating="true"
+            mode="cell"
+          />
+          <DxColumn data-field="name" />
+        </DxDataGrid>
       </pane>
       <pane min-size="20">
-        <h3>Add</h3>
-
         <div>
           <input type="text" id="add-name" placeholder="New to-do">
           <button :class="{'se-add-todo-item-button': true}" v-on:click="addItem">Add</button>
@@ -27,6 +41,7 @@
             :allow-column-reordering="true"
             :row-alternation-enabled="true"
             :show-borders="true"
+            :show-column-headers="false"
             @saving="onSaving"
         >
           <DxEditing
@@ -51,6 +66,7 @@ import ArrayStore from 'devextreme/data/array_store';
 import DataSource from 'devextreme/data/data_source';
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
+const projectsDataGridRefKey = 'projects-data-grid';
 
 export default {
   name: 'MainPanel',
@@ -66,9 +82,10 @@ export default {
   },
   data() {
     return {
-      projects: [ 'Inbox', 'Project 1', 'Project 2'],
+      projects: [{name: 'Inbox'}, {name: 'Project 1'}, {name: 'Project 2'}],
       todoItems: [],
       todoItemsDataGridRefKey,
+      projectsDataGridRefKey,
       dataSource: new DataSource({
         store: new ArrayStore({
           key: 'id',
