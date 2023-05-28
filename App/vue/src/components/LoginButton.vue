@@ -20,116 +20,117 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       try {
-        initPage(this);
+        this.initPage();
       } catch (e) {
         notify(e.toString() + '\n', 'error', 5000);
         throw e;
       }
     })
   },
-}
+  methods: {
+    initPage() {
+      let loginFormData = {
+        profile: null,
+        username: null,
+        password: null,
+      };
 
-function initPage(thisComponent) {
-  let loginFormData = {
-    profile: null,
-    username: null,
-    password: null,
-  };
-
-  let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
-  if (previouslyEnteredProfile !== null) {
-    loginFormData.profile = previouslyEnteredProfile
-  }
-
-  const loginForm = new Form($('#login-form'), {
-    colCount: 2,
-    labelMode: 'floating',
-    formData: loginFormData,
-    items: [{
-      dataField: 'profile',
-      label: 'Profile',
-      validationRules: [{
-        type: 'required',
-      }],
-    }, {
-      dataField: 'username',
-      label: 'Username',
-      editorOptions: {
-        inputAttr: {
-          type: 'username',
-          autocomplete: 'on',
-        },
-      },
-      validationRules: [{
-        type: 'required',
-      }],
-    }, {
-      dataField: 'password',
-      label: 'Password',
-      editorOptions: {
-        mode: 'password',
-        inputAttr: {
-          type: 'password',
-          autocomplete: 'on',
-        },
-      },
-      validationRules: [{
-        type: 'required',
-        message: 'Password is required',
-      }],
-    }],
-  });
-
-  new Button($('#login-button'), {
-    stylingMode: 'contained',
-    text: 'Sign in',
-    type: 'default',
-    width: 120,
-    onClick() {
-      let userDto = loginForm.option('formData');
-      let validationResult = loginForm.validate();
-      if (!validationResult.isValid) {
-        notify('Failed to sign in.', 'Check credentials input and try again.');
-        return;
+      let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
+      if (previouslyEnteredProfile !== null) {
+        loginFormData.profile = previouslyEnteredProfile
       }
 
-      localStorage.setItem('loginForm.profile', userDto.profile);
+      const loginForm = new Form($('#login-form'), {
+        colCount: 2,
+        labelMode: 'floating',
+        formData: loginFormData,
+        items: [{
+          dataField: 'profile',
+          label: 'Profile',
+          validationRules: [{
+            type: 'required',
+          }],
+        }, {
+          dataField: 'username',
+          label: 'Username',
+          editorOptions: {
+            inputAttr: {
+              type: 'username',
+              autocomplete: 'on',
+            },
+          },
+          validationRules: [{
+            type: 'required',
+          }],
+        }, {
+          dataField: 'password',
+          label: 'Password',
+          editorOptions: {
+            mode: 'password',
+            inputAttr: {
+              type: 'password',
+              autocomplete: 'on',
+            },
+          },
+          validationRules: [{
+            type: 'required',
+            message: 'Password is required',
+          }],
+        }],
+      });
 
-      fetch('https://localhost:7147/api/Auth/Login', {
-        method: 'POST',
-        headers: {
-          'Accept': 'text',
-          'Content-Type': 'application/json',
+      new Button($('#login-button'), {
+        stylingMode: 'contained',
+        text: 'Sign in',
+        type: 'default',
+        width: 120,
+        onClick() {
+          let userDto = loginForm.option('formData');
+          let validationResult = loginForm.validate();
+          if (!validationResult.isValid) {
+            notify('Failed to sign in.', 'Check credentials input and try again.');
+            return;
+          }
+
+          localStorage.setItem('loginForm.profile', userDto.profile);
+
+          fetch('https://localhost:7147/api/Auth/Login', {
+            method: 'POST',
+            headers: {
+              'Accept': 'text',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userDto),
+          })
+            .then(response => {
+              if (response.status === 401) {
+                notify('Failed to sign in.', 'Incorrect credentials input.');
+              }
+              if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+              }
+              return response.text();
+            })
+            .then(token => {
+              localStorage.setItem('authToken', token);
+              document.location.reload();
+            })
+            .catch(error => notify('Failed to sign in.', error));
         },
-        body: JSON.stringify(userDto),
-      })
-          .then(response => {
-            if (response.status === 401) {
-              notify('Failed to sign in.', 'Incorrect credentials input.');
-            }
-            if (!response.ok) {
-              throw new Error("HTTP status " + response.status);
-            }
-            return response.text();
-          })
-          .then(token => {
-            localStorage.setItem('authToken', token);
-            document.location.reload();
-          })
-          .catch(error => notify('Failed to sign in.', error));
-    },
-  });
+      });
 
-  new Popover($('#loginPopover'), {
-    target: '#loginPopoverLink',
-    showEvent: 'dxclick',
-    position: 'bottom',
-    width: 500,
-    shading: true,
-    shadingColor: 'rgba(0, 0, 0, 0.5)',
-  });
-    
-  document.getElementById('se-ajax-load-status').innerText = 'complete';
+      new Popover($('#loginPopover'), {
+        target: '#loginPopoverLink',
+        showEvent: 'dxclick',
+        position: 'bottom',
+        width: 500,
+        shading: true,
+        shadingColor: 'rgba(0, 0, 0, 0.5)',
+      });
+
+      document.getElementById('se-ajax-load-status').innerText = 'complete';
+    }
+  }
 }
 
 </script>

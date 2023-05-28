@@ -559,3 +559,6 @@ appsettings.Development.json
 /data
 
 .idea/**/dataSources.xml
+
+# Custom
+/wwwroot

@@ -3,8 +3,10 @@ using Serilog;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
@@ -14,13 +16,16 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-Log.Information("Start.");
+Log.Information("Start");
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog();
+    builder.Host.UseSerilog((_, config) =>
+    {
+        config.MinimumLevel.Is(LogEventLevel.Debug);
+    });
 
     builder.Services.AddControllers();
     builder.Services.AddDbContext<TodoContext>(options =>
@@ -44,7 +49,7 @@ try
     });
 
     var jwtKey = builder.Configuration.GetSection("AppSettings:JwtKey").Value ??
-                 throw new ConfigurationErrorsException("Required configuration option AppSettings:JwtKey is not set.");
+        throw new ConfigurationErrorsException("Required configuration option AppSettings:JwtKey is not set.");
 
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
@@ -67,14 +72,11 @@ try
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseDefaultFiles();
-    app.UseStaticFiles();
-    /*
-    app.UseStaticFiles(new StaticFileOptions()
+    var wwwrootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../wwwroot"));
+    app.UseFileServer(new FileServerOptions
     {
-        FileProvider = new PhysicalFileProvider(@"C:\Code\ak\github\TodoLists\foo\hello-vue\dist"),
+        FileProvider = new PhysicalFileProvider(wwwrootDir),
     });
-    */
 
     app.UseHttpsRedirection();
 
@@ -83,6 +85,7 @@ try
 
     app.MapControllers();
 
+    Log.Information("Completed configuring ASP.NET app");
     app.Run();
 }
 catch (HostAbortedException)
