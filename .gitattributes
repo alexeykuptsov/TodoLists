@@ -1,4 +1,2 @@
-﻿*.cs linguist-detectable=true
-*.js linguist-detectable=true
-*.vue linguist-detectable=true
-*.css linguist-detectable=false
+﻿*.vue linguist-detectable=true linguist-language=Vue.js
+lib/* linguist-detectable=false
