@@ -9,7 +9,6 @@
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
         <Label DockPanel.Dock="Top" Content="{Binding TodoListsAppStatusText}" />
-        <Label DockPanel.Dock="Top" Content="{Binding PostgresStatusText}" />
         <StackPanel/>
     </DockPanel>
 </Window>

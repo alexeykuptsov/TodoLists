@@ -98,7 +98,7 @@ namespace TodoLists.App.Controllers
 
         private bool ProfileExists(long id)
         {
-            return (myContext.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
+            return myContext.Profiles.Any(e => e.Id == id);
         }
     }
 }

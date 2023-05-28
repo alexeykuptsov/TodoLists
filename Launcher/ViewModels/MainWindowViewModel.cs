@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace WpfApp.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
-    private readonly Process myPostgresProcess;
     private string myTodoListsAppStatusText;
 
     public MainWindowViewModel(Process todoListsAppProcess)

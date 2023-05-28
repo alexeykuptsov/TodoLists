@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using EasyExceptions;
 using Serilog;
 using Serilog.Events;
 using WpfApp.ViewModels;
@@ -16,8 +17,7 @@ namespace WpfApp
     public partial class App
     {
         private Process? myTodoListsAppProcess;
-        private Process? myPgCtlProcess;
-        
+
         protected override void OnStartup(StartupEventArgs e)
         { 
             base.OnStartup(e);
@@ -34,13 +34,14 @@ namespace WpfApp
                 AppDomain.CurrentDomain.UnhandledException += (_, args) =>
                 {
                     var logLevel = args.IsTerminating ? LogEventLevel.Fatal : LogEventLevel.Error;
-                    if (args.ExceptionObject is Exception e)
+                    if (args.ExceptionObject is Exception exception)
                     {
-                        Log.Write(logLevel, e, "Unhandled exception");
+                        Log.Write(
+                            logLevel, exception, "Unhandled exception: {Exception}", ExceptionDumpUtil.Dump(exception));
                     }
                     else
                     {
-                        Log.Write(logLevel, args.ExceptionObject.ToString(), "Unhandled exception (object).");
+                        Log.Write(logLevel, "Unhandled exception object: {ExceptionObject}", args.ExceptionObject.ToString());
                     }
                 };
                 DispatcherUnhandledException += (_, args) =>
@@ -110,7 +111,7 @@ namespace WpfApp
                 }
 
                 var pgCtlArguments = $"-o \"-p 41577\" -D {postgresDataDir} -l {Path.Combine(postgresWorkingDir, "../postgres.log")} start";
-                myPgCtlProcess = Process.Start(new ProcessStartInfo
+                Process.Start(new ProcessStartInfo
                 {
                     FileName = Path.Combine(postgresWorkingDir, "pg_ctl.exe"),
                     Arguments = pgCtlArguments,
@@ -149,7 +150,7 @@ namespace WpfApp
 
         #region Rider Console support
 
-        private const int ATTACH_PARENT_PROCESS = -1;
+        private const int AttachParentProcess = -1;
 
         [DllImport("kernel32.dll")]
         private static extern bool AttachConsole(int dwProcessId);
@@ -162,7 +163,7 @@ namespace WpfApp
         /// </remarks>
         public static void AttachToParentConsole()
         {
-            AttachConsole(ATTACH_PARENT_PROCESS);
+            AttachConsole(AttachParentProcess);
         }
 
         #endregion

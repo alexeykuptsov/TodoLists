@@ -101,5 +101,5 @@ finally
     Log.CloseAndFlush();
 }
 
-Log.Information("Exited gracefully.");
+Log.Information("Exited gracefully");
 

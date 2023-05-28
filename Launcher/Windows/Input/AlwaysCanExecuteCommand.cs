@@ -14,7 +14,7 @@ public class AlwaysCanExecuteCommand : ICommand
         myExecute = _ => execute();
     }
 
-    public AlwaysCanExecuteCommand(Action<object> execute)
+    public AlwaysCanExecuteCommand(Action<object?> execute)
     {
         myExecute = execute;
     }
@@ -27,7 +27,7 @@ public class AlwaysCanExecuteCommand : ICommand
         };
     }
 
-    public AlwaysCanExecuteCommand(Func<object, Task> execute)
+    public AlwaysCanExecuteCommand(Func<object?, Task> execute)
     {
         myExecute = parameter =>
         {
@@ -36,17 +36,17 @@ public class AlwaysCanExecuteCommand : ICommand
     }
 
 #pragma warning disable 67
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
-        myExecute?.Invoke(parameter);
+        myExecute.Invoke(parameter);
     }
 
-    private readonly Action<object> myExecute;
+    private readonly Action<object?> myExecute;
 }

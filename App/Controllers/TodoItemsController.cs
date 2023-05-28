@@ -1,8 +1,6 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 
@@ -52,9 +50,9 @@ public class TodoItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Update>
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutTodoItem(long id, TodoItemDto todoDTO)
+    public async Task<IActionResult> PutTodoItem(long id, TodoItemDto todoDto)
     {
-        if (id != todoDTO.Id)
+        if (id != todoDto.Id)
         {
             return BadRequest();
         }
@@ -65,8 +63,8 @@ public class TodoItemsController : ControllerBase
             return NotFound();
         }
 
-        todoItem.Name = todoDTO.Name;
-        todoItem.IsComplete = todoDTO.IsComplete;
+        todoItem.Name = todoDto.Name;
+        todoItem.IsComplete = todoDto.IsComplete;
 
         try
         {
