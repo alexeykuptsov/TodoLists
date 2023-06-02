@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="main-header">
-      <h1>To-Do Lits</h1>
+      <h1>To-Do Lists</h1>
     </div>
     <splitpanes id="main-splitpanes" class="default-theme">
       <pane min-size="20" size="30">
@@ -16,16 +16,25 @@
           :row-alternation-enabled="true"
           :show-borders="true"
           :show-column-headers="false"
+          :focused-row-enabled="true"
           @saving="onSaving"
         >
           <DxEditing
             :allow-updating="true"
-            mode="cell"
+            :allow-deleting="true"
+            :allow-adding="true"
+            mode="row"
           />
+          
           <DxColumn data-field="name" />
         </DxDataGrid>
       </pane>
       <pane min-size="20">
+        <div>
+          <h3 id="project-name" style="display: inline-block;">Project Name</h3>
+          <p id="counter" style="display: inline-block; padding-left: 20px;"></p>
+        </div>
+        
         <div>
           <input type="text" id="add-name" placeholder="New to-do">
           <button :class="{'se-add-todo-item-button': true}" v-on:click="addItem">Add</button>
