@@ -83,7 +83,7 @@ public class TodoItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Create>
     [HttpPost]
-    public async Task<ActionResult<TodoItemDto>> PostTodoItem(TodoItemDto todoDto)
+    public async Task<IActionResult> PostTodoItem(TodoItemDto todoDto)
     {
         var todoItem = new TodoItem
         {
@@ -95,7 +95,7 @@ public class TodoItemsController : ControllerBase
         myContext.TodoItems.Add(todoItem);
         await myContext.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, ItemToDto(todoItem));
+        return Ok();
     }
     // </snippet_Create>
 

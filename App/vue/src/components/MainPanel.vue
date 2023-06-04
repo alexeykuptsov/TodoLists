@@ -25,7 +25,9 @@
             :allow-adding="true"
             mode="row"
           />
-          
+          <DxRowDragging
+            :allow-reordering="true"
+          />
           <DxColumn data-field="name" />
         </DxDataGrid>
       </pane>
@@ -70,9 +72,11 @@ import $ from 'jquery';
 import notify from 'devextreme/ui/notify';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import {DxDataGrid, DxColumn, DxEditing} from 'devextreme-vue/data-grid';
+import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from 'devextreme-vue/data-grid';
 import ArrayStore from 'devextreme/data/array_store';
 import DataSource from 'devextreme/data/data_source';
+import * as notifyUtils from '../utils/notifyUtils';
+import * as fetchUtils from '../utils/fetchUtils';
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
 const projectsDataGridRefKey = 'projects-data-grid';
@@ -88,6 +92,7 @@ export default {
     DxDataGrid,
     DxColumn,
     DxEditing,
+    DxRowDragging,
   },
   data() {
     return {
@@ -126,101 +131,39 @@ export default {
     window.removeEventListener("resize", this.windowResizeHandler);
   },
   methods: {
-    windowResizeHandler(e) {
+    windowResizeHandler() {
       adjustElementSizes();
     },
     addItem() {
-      const addNameTextbox = document.getElementById('add-name');
+      const addNameTextBox = document.getElementById('add-name');
 
       const item = {
         isComplete: false,
-        name: addNameTextbox.value.trim()
+        name: addNameTextBox.value.trim()
       };
 
-      let authToken = localStorage.getItem('authToken');
-      fetch(this.uri, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + authToken,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(item)
-      })
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            }
-            throw new Error('Response is not OK (status=' + response.status + ')');
-          })
-          .then(() => {
-            this.refreshPageData();
-            addNameTextbox.value = '';
-          })
-          .catch(error => notify(error, 'error', 10_000));
+      fetchUtils.post(this.uri, item)
+        .then(() => {
+          this.refreshPageData();
+          addNameTextBox.value = '';
+        });
     },
     refreshPageData() {
-      let authToken = localStorage.getItem('authToken');
-    
-      if (authToken === null) {
-        throw new Error('Unexpected auth token value. It is asserted that it is not null.');
-      }
-    
-      fetch(this.uri, {
-        headers: {
-          'Authorization': 'Bearer ' + authToken,
-        }
-      })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("HTTP status " + response.status);
-            }
-            return response.json();
-          })
-          .then(data => this._displayItems(data))
-          .catch(error => {
-            if (error.message === 'HTTP status 401') {
-              localStorage.removeItem('authToken');
-              window.location.reload();
-            }
-    
-            let toastMessage = 'Unknown error on loading items. ' + error.message;
-            let notifyToastOptions = {
-              type: 'error',
-              displayTime: 5000,
-              contentTemplate(element) {
-                const $rootDiv = $('<div>')
-    
-                const $text = $('<div>').text(toastMessage);
-                $rootDiv.append($text);
-    
-                const $copyLink = $('<a>')
-                    .attr('href', '#')
-                    .attr('onclick', `navigator.clipboard.writeText('${toastMessage}');`)
-                    .attr('style', 'color: #99ddff;')
-                    .text('Копировать текст ошибки');
-                $rootDiv.append($copyLink);
-    
-                element.append($rootDiv);
-              }
-            };
-            notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
-            throw error;
-          });
+      fetchUtils.get(this.uri).then(data => this._displayItems(data));
     },
     deleteItem(id) {
       let authToken = localStorage.getItem('authToken');
       fetch(`${this.uri}/${id}`, {method: 'DELETE', headers: {'Authorization': 'Bearer ' + authToken}})
           .then(() => this.refreshPageData())
-          .catch(error => console.error('Unable to delete item.', error));
+          .catch(error => notifyUtils.notifyError('Unable to delete item.', error));
     },
     onSaving(e) {
       fetch(this.uri, {
         method: 'PATCH',
         headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
-        body: JSON.stringify(e.changes),        
+        body: JSON.stringify(e.changes),
       })
-          .catch(error => console.error('Unable to delete item.', error));
+        .catch(error => notifyUtils.notifyError('Unable to patch item.', error));
     },
     _displayItems(data) {
       _displayCount(data.length);
