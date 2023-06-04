@@ -17,7 +17,7 @@
           :show-borders="true"
           :show-column-headers="false"
           :focused-row-enabled="true"
-          @saving="onSaving"
+          @saving="projectsDataGrid_onSaving"
         >
           <DxEditing
             :allow-updating="true"
@@ -69,7 +69,6 @@
 
 <script>
 import $ from 'jquery';
-import notify from 'devextreme/ui/notify';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from 'devextreme-vue/data-grid';
@@ -96,7 +95,7 @@ export default {
   },
   data() {
     return {
-      projects: [{name: 'Inbox'}, {name: 'Project 1'}, {name: 'Project 2'}],
+      projects: [],
       todoItems: [],
       todoItemsDataGridRefKey,
       projectsDataGridRefKey,
@@ -107,23 +106,21 @@ export default {
         }),
       }),
       uri: 'api/TodoItems',
-
+      projectsUri: 'api/Projects',
     };
   },
   computed: {
     todoItemsDataGrid: function() {
       return this.$refs[todoItemsDataGridRefKey].instance;
-    }
+    },
+    projectsDataGrid: function() {
+      return this.$refs[projectsDataGridRefKey].instance;
+    },
   },
   mounted() {
     this.$nextTick(function () {
-      try {
-        this.refreshPageData();
-        adjustElementSizes();
-      } catch (e) {
-        notify(e.toString() + '\n', 'error', 5000);
-        throw e;
-      }
+      this.refreshPageData();
+      adjustElementSizes();
       window.addEventListener("resize", this.windowResizeHandler);
     });
   },
@@ -149,7 +146,12 @@ export default {
         });
     },
     refreshPageData() {
-      fetchUtils.get(this.uri).then(data => this._displayItems(data));
+      fetchUtils.get(this.uri).then(data => {
+        this._displayItems(data);
+      });
+      fetchUtils.get(this.projectsUri).then(data => {
+        this._displayProjects(data);
+      });
     },
     deleteItem(id) {
       let authToken = localStorage.getItem('authToken');
@@ -159,6 +161,14 @@ export default {
     },
     onSaving(e) {
       fetch(this.uri, {
+        method: 'PATCH',
+        headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify(e.changes),
+      })
+        .catch(error => notifyUtils.notifyError('Unable to patch item.', error));
+    },
+    projectsDataGrid_onSaving(e) {
+      fetch(this.projectsUri, {
         method: 'PATCH',
         headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
         body: JSON.stringify(e.changes),
@@ -182,6 +192,21 @@ export default {
           document.getElementById('se-ajax-load-status').innerText = 'complete';
         });
     },
+    _displayProjects(data) {
+
+      this.projects.splice(0);
+      data.forEach(item => {
+        this.projects.push({
+          id: item.id,
+          name: item.name,
+        });
+      });
+
+      this.projectsDataGrid.refresh()
+        .done(() => {
+          // document.getElementById('se-ajax-load-status').innerText = 'complete';
+        });
+    },
   }
 }
 
@@ -200,8 +225,3 @@ function _displayCount(itemCount) {
 }
 
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

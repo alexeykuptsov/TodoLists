@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
-using TodoLists.App.Models;
+using TodoLists.App.Entities;
 using TodoLists.App.Services;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("TodoLists.App.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+    .WriteTo.File("TodoLists.App.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 8)
     .WriteTo.Console()
     .CreateLogger();
 
@@ -22,13 +21,10 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog((_, config) =>
-    {
-        config.MinimumLevel.Is(LogEventLevel.Debug);
-    });
+    builder.Host.UseSerilog();
 
     builder.Services.AddControllers();
-    builder.Services.AddDbContext<TodoContext>(options =>
+    builder.Services.AddDbContext<TodoListsDbContext>(options =>
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString("TodoContext"));
         options.UseSnakeCaseNamingConvention();
@@ -84,7 +80,7 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
-
+    
     Log.Information("Completed configuring ASP.NET app");
     app.Run();
 }

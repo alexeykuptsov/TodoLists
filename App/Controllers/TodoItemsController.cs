@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TodoLists.App.Entities;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 
@@ -11,12 +12,12 @@ namespace TodoLists.App.Controllers;
 [Authorize]
 public class TodoItemsController : ControllerBase
 {
-    private readonly TodoContext myContext;
+    private readonly TodoListsDbContext myListsDbContext;
     private readonly IUserService myUserService;
 
-    public TodoItemsController(TodoContext context, IUserService userService)
+    public TodoItemsController(TodoListsDbContext listsDbContext, IUserService userService)
     {
-        myContext = context;
+        myListsDbContext = listsDbContext;
         myUserService = userService;
     }
 
@@ -24,7 +25,7 @@ public class TodoItemsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems()
     {
-        return await myContext.TodoItems
+        return await myListsDbContext.TodoItems
             .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
             .Select(x => ItemToDto(x))
             .ToListAsync();
@@ -35,7 +36,7 @@ public class TodoItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoItemDto>> GetTodoItem(long id)
     {
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
 
         if (todoItem == null)
         {
@@ -57,7 +58,7 @@ public class TodoItemsController : ControllerBase
             return BadRequest();
         }
 
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
@@ -68,7 +69,7 @@ public class TodoItemsController : ControllerBase
 
         try
         {
-            await myContext.SaveChangesAsync();
+            await myListsDbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
         {
@@ -87,13 +88,13 @@ public class TodoItemsController : ControllerBase
     {
         var todoItem = new TodoItem
         {
-            Profile = await myContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
+            Profile = await myListsDbContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
             IsComplete = todoDto.IsComplete,
             Name = todoDto.Name,
         };
 
-        myContext.TodoItems.Add(todoItem);
-        await myContext.SaveChangesAsync();
+        myListsDbContext.TodoItems.Add(todoItem);
+        await myListsDbContext.SaveChangesAsync();
 
         return Ok();
     }
@@ -103,14 +104,14 @@ public class TodoItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(long id)
     {
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
         }
 
-        myContext.TodoItems.Remove(todoItem);
-        await myContext.SaveChangesAsync();
+        myListsDbContext.TodoItems.Remove(todoItem);
+        await myListsDbContext.SaveChangesAsync();
 
         return Ok();
     }
@@ -127,13 +128,13 @@ public class TodoItemsController : ControllerBase
                 if (propertyName == "isComplete")
                 {
                     bool propertyValue = property.Value.GetBoolean();
-                    await myContext.TodoItems.Where(x => x.Id == id).
+                    await myListsDbContext.TodoItems.Where(x => x.Id == id).
                         ExecuteUpdateAsync(x => x.SetProperty(t => t.IsComplete, propertyValue));
                 }
                 if (propertyName == "title")
                 {
                     string propertyValue = property.Value.GetString();
-                    await myContext.TodoItems.Where(x => x.Id == id).
+                    await myListsDbContext.TodoItems.Where(x => x.Id == id).
                         ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
                 }
             }
@@ -143,7 +144,7 @@ public class TodoItemsController : ControllerBase
 
     private bool TodoItemExists(long id)
     {
-        return myContext.TodoItems.Any(e => e.Id == id);
+        return myListsDbContext.TodoItems.Any(e => e.Id == id);
     }
 
     private static TodoItemDto ItemToDto(TodoItem todoItem) =>

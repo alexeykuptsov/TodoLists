@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace TodoLists.App.Models;
+namespace TodoLists.App.Entities;
 
 [Index(nameof(Name), IsUnique = true)]
 public class Profile

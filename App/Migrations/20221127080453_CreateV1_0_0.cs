@@ -42,6 +42,26 @@ namespace TodoLists.App.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    profileid = table.Column<long>(name: "profile_id", type: "bigint", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_projects", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_projects_profiles_profile_id",
+                        column: x => x.profileid,
+                        principalTable: "profiles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "todo_items",
                 columns: table => new
                 {
@@ -92,6 +112,11 @@ namespace TodoLists.App.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_projects_profile_id",
+                table: "projects",
+                column: "profile_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_super_users_username_lower_case",
                 table: "super_users",
                 column: "username_lower_case",
@@ -112,6 +137,9 @@ namespace TodoLists.App.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "projects");
+
             migrationBuilder.DropTable(
                 name: "super_users");
 

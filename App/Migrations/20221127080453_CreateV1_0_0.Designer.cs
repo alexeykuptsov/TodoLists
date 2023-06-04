@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TodoLists.App.Models;
+using TodoLists.App.Entities;
 
 #nullable disable
 
 namespace TodoLists.App.Migrations
 {
-    [DbContext(typeof(TodoContext))]
-    [Migration("20221127080453_CreateV1_0_0")]
+    [DbContext(typeof(TodoListsDbContext))]
+    [Migration("20230604201823_CreateV1_0_0")]
     partial class CreateV100
     {
         /// <inheritdoc />
@@ -24,7 +24,7 @@ namespace TodoLists.App.Migrations
 
             NpgsqlModelBuilderExtensions.UseSerialColumns(modelBuilder);
 
-            modelBuilder.Entity("TodoLists.App.Models.Profile", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.Profile", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +52,33 @@ namespace TodoLists.App.Migrations
                     b.ToTable("profiles", (string)null);
                 });
 
-            modelBuilder.Entity("TodoLists.App.Models.SuperUser", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.Project", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<long>("ProfileId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("profile_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_projects");
+
+                    b.HasIndex("ProfileId")
+                        .HasDatabaseName("ix_projects_profile_id");
+
+                    b.ToTable("projects", (string)null);
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.SuperUser", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,7 +117,7 @@ namespace TodoLists.App.Migrations
                     b.ToTable("super_users", (string)null);
                 });
 
-            modelBuilder.Entity("TodoLists.App.Models.TodoItem", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.TodoItem", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +147,7 @@ namespace TodoLists.App.Migrations
                     b.ToTable("todo_items", (string)null);
                 });
 
-            modelBuilder.Entity("TodoLists.App.Models.User", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,9 +190,21 @@ namespace TodoLists.App.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("TodoLists.App.Models.TodoItem", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.Project", b =>
                 {
-                    b.HasOne("TodoLists.App.Models.Profile", "Profile")
+                    b.HasOne("TodoLists.App.Entities.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_profiles_profile_id");
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.TodoItem", b =>
+                {
+                    b.HasOne("TodoLists.App.Entities.Profile", "Profile")
                         .WithMany()
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -176,9 +214,9 @@ namespace TodoLists.App.Migrations
                     b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("TodoLists.App.Models.User", b =>
+            modelBuilder.Entity("TodoLists.App.Entities.User", b =>
                 {
-                    b.HasOne("TodoLists.App.Models.Profile", "Profile")
+                    b.HasOne("TodoLists.App.Entities.Profile", "Profile")
                         .WithMany()
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)

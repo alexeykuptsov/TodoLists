@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace TodoLists.App.Models;
+namespace TodoLists.App.Entities;
 
-public class TodoContext : DbContext
+public class TodoListsDbContext : DbContext
 {
-    public TodoContext(DbContextOptions<TodoContext> options)
+    public TodoListsDbContext(DbContextOptions<TodoListsDbContext> options)
         : base(options)
     {
     }
@@ -19,4 +19,5 @@ public class TodoContext : DbContext
     public DbSet<Profile> Profiles { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<TodoItem> TodoItems { get; set; } = null!;
+    public DbSet<Project> Projects { get; set; } = null!;
 }

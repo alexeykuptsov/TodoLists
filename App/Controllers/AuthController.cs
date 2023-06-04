@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TodoLists.App.Entities;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 using TodoLists.App.Utils;
@@ -14,19 +15,19 @@ namespace TodoLists.App.Controllers;
 [ApiController]
 public class AuthController : Controller
 {
-    private readonly TodoContext myContext;
+    private readonly TodoListsDbContext myListsDbContext;
     private readonly IConfiguration myConfiguration;
 
-    public AuthController(TodoContext context, IConfiguration configuration)
+    public AuthController(TodoListsDbContext listsDbContext, IConfiguration configuration)
     {
-        myContext = context;
+        myListsDbContext = listsDbContext;
         myConfiguration = configuration;
     }
 
     [HttpPost("[action]")]
     public async Task<ActionResult<string>> Login(UserDto request)
     {
-        var user = await myContext.Users.Include(x => x.Profile).SingleOrDefaultAsync(
+        var user = await myListsDbContext.Users.Include(x => x.Profile).SingleOrDefaultAsync(
             x => x.Profile.Name == request.Profile && x.UsernameLowerCase == request.Username.ToLower());
 
         if (user == null ||
@@ -40,7 +41,7 @@ public class AuthController : Controller
     [HttpPost("[action]")]
     public async Task<ActionResult<string>> LoginSuperUser(SuperUserDto request)
     {
-        var superUser = await myContext.SuperUsers.SingleOrDefaultAsync(
+        var superUser = await myListsDbContext.SuperUsers.SingleOrDefaultAsync(
             x => x.UsernameLowerCase == request.Username.ToLower());
 
         if (superUser == null || 

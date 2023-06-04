@@ -1,4 +1,4 @@
-﻿namespace TodoLists.App.Models;
+﻿namespace TodoLists.App.Entities;
 
 public class TodoItem
 {
