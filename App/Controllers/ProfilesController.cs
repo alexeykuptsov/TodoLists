@@ -28,7 +28,8 @@ namespace TodoLists.App.Controllers
         [HttpGet("Count")]
         public async Task<ActionResult> GetProfilesCount()
         {
-            return Ok(await myListsDbContext.Profiles.CountAsync());
+            var profilesCount = await myListsDbContext.Profiles.CountAsync();
+            return Ok(profilesCount);
         }
 
         // GET: api/Profiles/5
@@ -92,10 +93,10 @@ namespace TodoLists.App.Controllers
             var project = new Project
             {
                 Name = "Inbox",
-                Profile = profile,
+                Profile = profileEntity,
             };
             myListsDbContext.Projects.Add(project);
-            
+
             await myListsDbContext.SaveChangesAsync();
 
             return CreatedAtAction("GetProfile", new { id = profile.Id }, profile);

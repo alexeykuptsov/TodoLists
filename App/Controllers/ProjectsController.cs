@@ -1,3 +1,4 @@
+using System.Text.Json;
 using EasyExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,26 +105,54 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<IActionResult> PatchProject([FromBody] dynamic body)
+    public async Task<IActionResult> PatchProject([FromBody] JsonElement body)
     {
         return await WithExceptionHandling(async () =>
         {
-            foreach (dynamic change in body.EnumerateArray())
+            foreach (var change in body.EnumerateArray())
             {
-                long id = change.GetProperty("key").GetProperty("id").GetInt64();
-                foreach (dynamic property in change.GetProperty("data").EnumerateObject())
+                var changeType = change.GetProperty("type").GetString();
+                var data = change.GetProperty("data");
+                switch (changeType)
                 {
-                    string propertyName = property.Name;
-                    if (propertyName == "name")
-                    {
-                        string propertyValue = property.Value.GetString();
-                        await myListsDbContext.Projects.Where(x => x.Id == id).
-                            ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
-                    }
+                    case "insert":
+                        await InsertProject(data);
+                        break;
+                    case "update":
+                        long id = change.GetProperty("key").GetProperty("id").GetInt64();
+                        await UpdateProject(data, id);
+                        break;
                 }
             }
             return Ok();
         });
+    }
+
+    private async Task UpdateProject(JsonElement data, long id)
+    {
+        foreach (dynamic property in data.EnumerateObject())
+        {
+            string propertyName = property.Name;
+            if (propertyName == "name")
+            {
+                string propertyValue = property.Value.GetString();
+                await myListsDbContext.Projects
+                    .Where(x => x.Id == id && x.ProfileId == myUserService.GetCurrentUserProfileId())
+                    .ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
+            }
+        }
+
+        return;
+    }
+
+    private async Task InsertProject(JsonElement data)
+    {
+        await myListsDbContext.Projects.AddAsync(new Project
+        {
+            ProfileId = myUserService.GetCurrentUserProfileId(),
+            Name = data.GetProperty("name").GetString(),
+        });
+        await myListsDbContext.SaveChangesAsync();
     }
 
     private static async Task<T> WithExceptionHandling<T>(Func<Task<T>> action)

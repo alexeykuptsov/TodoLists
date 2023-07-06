@@ -10,13 +10,14 @@
         <DxDataGrid
           :class="{ 'se-projects-data-grid': true }"
           :ref="projectsDataGridRefKey"
-          :data-source="projects"
+          :data-source="projectsDataSource"
           :remote-operations="false"
           :allow-column-reordering="true"
           :row-alternation-enabled="true"
           :show-borders="true"
           :show-column-headers="false"
           :focused-row-enabled="true"
+          :auto-navigate-to-focused-row="true"
           @saving="projectsDataGrid_onSaving"
         >
           <DxEditing
@@ -53,6 +54,7 @@
             :row-alternation-enabled="true"
             :show-borders="true"
             :show-column-headers="false"
+            v-model:focused-row-key="focusedRowKey"
             @saving="onSaving"
         >
           <DxEditing
@@ -105,8 +107,15 @@ export default {
           data: this.todoItems,
         }),
       }),
+      projectsDataSource: new DataSource({
+        store: new ArrayStore({
+          key: 'id',
+          data: this.projects,
+        }),
+      }),
       uri: 'api/TodoItems',
       projectsUri: 'api/Projects',
+      focusedRowKey: null,
     };
   },
   computed: {
@@ -201,11 +210,11 @@ export default {
           name: item.name,
         });
       });
-
-      this.projectsDataGrid.refresh()
-        .done(() => {
-          // document.getElementById('se-ajax-load-status').innerText = 'complete';
-        });
+      this.projectsDataSource.reload();
+      // this.projectsDataGrid.refresh()
+      //   .done(() => {
+      //     // this.focusedRowKey = data[0].id;
+      //   });
     },
   }
 }

@@ -11,7 +11,7 @@ using TodoLists.App.Entities;
 namespace TodoLists.App.Migrations
 {
     [DbContext(typeof(TodoListsDbContext))]
-    [Migration("20230604201823_CreateV1_0_0")]
+    [Migration("20230706131025_CreateV1_0_0")]
     partial class CreateV100
     {
         /// <inheritdoc />
