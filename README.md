@@ -1,6 +1,6 @@
 ﻿# To-Do Lists
 
-To-Do Lists in just another appllication for managing tasks with lists of check boxes.
+To-Do Lists in just another application for managing tasks with lists of check boxes.
 The app is implemented as an web application (ASP.NET Core + Vue.js + DevExtreme) with a PostgreSQL database behind.
 Also there is a WPF launcher which is used to run the app and the database on Windows (in the same manner as pgAdmin is run).
 
@@ -25,6 +25,8 @@ Install Postgres 14, .NET 7 and JetBrains Rider (as a default IDE for this proje
 
 ```shell
 dotnet tool install --global dotnet-ef
+npm install -g @vue/cli
+npm install
 ```
 
 ```postgresql
@@ -36,7 +38,7 @@ cd App
 dotnet ef database update
 ```
 
-Also you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refers to folder `pgsql` of unarchived
+Also for proper running of Launcher you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refers to folder `pgsql` of unarchived
 [Postgres ZIP distributive](https://www.enterprisedb.com/download-postgresql-binaries).
 For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
