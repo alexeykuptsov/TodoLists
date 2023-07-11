@@ -24,6 +24,6 @@ public class MainBasePage : BasePage
     }
 
     public List<string> TodoItemNames => Browser.Driver
-        .FindElements(By.CssSelector(".dx-datagrid .dx-data-row td[aria-colindex='2']")).Select(x => x.Text).ToList();
+        .FindElements(By.CssSelector(".se-todo-item-data-grid .dx-datagrid .dx-data-row td[aria-colindex='2']")).Select(x => x.Text).ToList();
     
 }

@@ -10,7 +10,7 @@
         <DxDataGrid
           :class="{ 'se-projects-data-grid': true }"
           :ref="projectsDataGridRefKey"
-          :data-source="projectsDataSource"
+          :data-source="projects"
           :remote-operations="false"
           :allow-column-reordering="true"
           :row-alternation-enabled="true"
@@ -18,6 +18,8 @@
           :show-column-headers="false"
           :focused-row-enabled="true"
           :auto-navigate-to-focused-row="true"
+          v-model:focused-row-key="focusedRowKey"
+          @focused-row-changed="onFocusedRowChanged"
           @saving="projectsDataGrid_onSaving"
         >
           <DxEditing
@@ -34,7 +36,7 @@
       </pane>
       <pane min-size="20">
         <div>
-          <h3 id="project-name" style="display: inline-block;">Project Name</h3>
+          <h3 id="project-name" style="display: inline-block;">{{projectName}}</h3>
           <p id="counter" style="display: inline-block; padding-left: 20px;"></p>
         </div>
         
@@ -101,21 +103,10 @@ export default {
       todoItems: [],
       todoItemsDataGridRefKey,
       projectsDataGridRefKey,
-      dataSource: new DataSource({
-        store: new ArrayStore({
-          key: 'id',
-          data: this.todoItems,
-        }),
-      }),
-      projectsDataSource: new DataSource({
-        store: new ArrayStore({
-          key: 'id',
-          data: this.projects,
-        }),
-      }),
       uri: 'api/TodoItems',
       projectsUri: 'api/Projects',
       focusedRowKey: null,
+      projectName: null,
     };
   },
   computed: {
@@ -210,11 +201,15 @@ export default {
           name: item.name,
         });
       });
-      this.projectsDataSource.reload();
-      // this.projectsDataGrid.refresh()
-      //   .done(() => {
-      //     // this.focusedRowKey = data[0].id;
-      //   });
+      // this.projectsDataSource.store().load();
+      this.projectsDataGrid.refresh()
+        .done(() => {
+          this.focusedRowKey = data[0];
+        });
+    },
+    onFocusedRowChanged(e) {
+      this.focusedRowKey = e.component.option('focusedRowKey');
+      this.projectName = this.projects.filter(x => x.id === this.focusedRowKey.id)[0].name;
     },
   }
 }

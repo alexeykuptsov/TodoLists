@@ -15,7 +15,6 @@ public class ProjectsTests
 
     // Do nothing
             
-    Assert.That(mainPage.ProjectNameLabel.Text, Is.EqualTo("Inbox"));
-    // Assert.That(mainPage.ProjectsDataGrid.Rows.Select(x => x.Name), Is.EqualTo(new [] {"Inbox"}));
+    browser.Wait.Until(_ => mainPage.ProjectNameLabel.Text == "Inbox");
   }
 }
