@@ -4,6 +4,12 @@
     <HTMLCodeStyleSettings>
       <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="thead,tbody,tfoot" />
     </HTMLCodeStyleSettings>
+    <editorconfig>
+      <option name="ENABLED" value="false" />
+    </editorconfig>
+    <stylecop>
+      <option name="ENABLED" value="true" />
+    </stylecop>
     <codeStyleSettings language="HTML">
       <option name="WRAP_ON_TYPING" value="1" />
       <indentOptions>

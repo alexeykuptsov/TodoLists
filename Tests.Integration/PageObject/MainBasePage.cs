@@ -25,5 +25,6 @@ public class MainBasePage : BasePage
 
     public List<string> TodoItemNames => Browser.Driver
         .FindElements(By.CssSelector(".se-todo-item-data-grid .dx-datagrid .dx-data-row td[aria-colindex='2']")).Select(x => x.Text).ToList();
-    
+
+    public List<String> ErrorMessages { get; } = new() { "foo" };
 }

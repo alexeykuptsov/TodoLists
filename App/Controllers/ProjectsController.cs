@@ -141,8 +141,6 @@ public class ProjectsController : ControllerBase
                     .ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
             }
         }
-
-        return;
     }
 
     private async Task InsertProject(JsonElement data)

@@ -1,6 +1,8 @@
-﻿using OpenQA.Selenium;
+﻿using NUnit.Framework.Constraints;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using TodoLists.Tests.Integration.Utils.NUnit;
 
 namespace TodoLists.Tests.Integration.PageObject;
 
@@ -16,6 +18,7 @@ public class Browser : IDisposable
         {
             PollingInterval = TimeSpan.FromMilliseconds(200),
         };
+        Wait.IgnoreExceptionTypes(typeof(AssertionException));
     }
 
     public void Dispose()
@@ -39,5 +42,21 @@ public class Browser : IDisposable
         var mainPage = new MainBasePage(this);
         mainPage.WaitUntilLoaded();
         return mainPage;
+    }
+    
+    public void WaitAndAssertThat<TActual>(Func<TActual> actualFunc, IResolveConstraint expression)
+    {
+        try
+        {
+            Wait.Until(_ =>
+            {
+                AssertSlim.That(actualFunc(), expression);
+                return true;
+            });
+        }
+        catch (WebDriverTimeoutException e)
+        {
+            throw e.InnerException ?? e;
+        }
     }
 }
