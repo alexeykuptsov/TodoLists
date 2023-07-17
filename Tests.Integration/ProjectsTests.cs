@@ -27,7 +27,7 @@ public class ProjectsTests
     using var browser = new Browser();
     var mainPage = browser.OpenSiteAndLogin(profileName, username);
   
-    // mainPage.ProjectsDataGrid.Rows[0].DeleteButton.Click();
+    mainPage.ProjectsDataGrid.Rows[0].DeleteButton.Click();
             
     var expectedErrors = new[]
     {

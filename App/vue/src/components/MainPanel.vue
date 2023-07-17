@@ -48,7 +48,7 @@
         <p id="counter"></p>
 
         <DxDataGrid
-            :class="{ 'se-todo-item-data-grid': true }"
+            :class="{ 'se-todo-items-data-grid': true }"
             :ref="todoItemsDataGridRefKey"
             :data-source="todoItems"
             :remote-operations="false"
