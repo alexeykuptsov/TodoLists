@@ -21,12 +21,14 @@
           v-model:focused-row-key="focusedRowKey"
           @focused-row-changed="onFocusedRowChanged"
           @saving="projectsDataGrid_onSaving"
+          @row-removing="projectsDataGrid_onRowRemoving"
         >
           <DxEditing
             :allow-updating="true"
             :allow-deleting="true"
             :allow-adding="true"
             mode="row"
+            :confirm-delete="false"
           />
           <DxRowDragging
             :allow-reordering="true"
@@ -76,10 +78,10 @@ import $ from 'jquery';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from 'devextreme-vue/data-grid';
-import ArrayStore from 'devextreme/data/array_store';
-import DataSource from 'devextreme/data/data_source';
+import { confirm } from 'devextreme/ui/dialog';
 import * as notifyUtils from '../utils/notifyUtils';
 import * as fetchUtils from '../utils/fetchUtils';
+import {notifyValidationError} from "../utils/notifyUtils";
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
 const projectsDataGridRefKey = 'projects-data-grid';
@@ -157,7 +159,7 @@ export default {
       let authToken = localStorage.getItem('authToken');
       fetch(`${this.uri}/${id}`, {method: 'DELETE', headers: {'Authorization': 'Bearer ' + authToken}})
           .then(() => this.refreshPageData())
-          .catch(error => notifyUtils.notifyError('Unable to delete item.', error));
+          .catch(error => notifyUtils.notifySystemError('Unable to delete item.', error));
     },
     onSaving(e) {
       fetch(this.uri, {
@@ -165,7 +167,7 @@ export default {
         headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
         body: JSON.stringify(e.changes),
       })
-        .catch(error => notifyUtils.notifyError('Unable to patch item.', error));
+        .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
     },
     projectsDataGrid_onSaving(e) {
       fetch(this.projectsUri, {
@@ -173,7 +175,27 @@ export default {
         headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
         body: JSON.stringify(e.changes),
       })
-        .catch(error => notifyUtils.notifyError('Unable to patch item.', error));
+        .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
+    },
+    projectsDataGrid_onRowRemoving(e) {
+      if (this.projects.length === 1)
+      {
+        notifyUtils.notifyValidationError(
+          'It is impossible to delete the last project. There should be at least one.', 'Error');
+        e.cancel = true;
+        return;
+      }
+
+      let index = e.component.getRowIndexByKey(e.key);
+      let rowEl = e.component.getRowElement(index);
+
+      let res = confirm("Do you really want to delete a record with key:" + e.key, "Warning");
+
+      e.cancel = new Promise((resolve, reject) => {
+        res.then((dialogResult) => {
+          resolve(!dialogResult)
+        });
+      })
     },
     _displayItems(data) {
       _displayCount(data.length);

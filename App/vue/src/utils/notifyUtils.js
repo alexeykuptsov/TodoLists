@@ -1,7 +1,7 @@
 ﻿import $ from "jquery";
 import notify from "devextreme/ui/notify";
 
-export function notifyError(message, error) {
+export function notifySystemError(message, error) {
   // noinspection JSUnusedGlobalSymbols
   let notifyToastOptions = {
     type: 'error',
@@ -25,4 +25,15 @@ export function notifyError(message, error) {
   // noinspection JSCheckFunctionSignatures
   notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
   console.error(error != null ? message + '\n' + error.stack : message);
+}
+
+export function notifyValidationError(message) {
+  // noinspection JSUnusedGlobalSymbols
+  let notifyToastOptions = {
+    type: 'error',
+    displayTime: 50000,
+    message: message,
+  };
+  // noinspection JSCheckFunctionSignatures
+  notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
 }

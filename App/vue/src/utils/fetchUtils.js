@@ -20,7 +20,7 @@ export function post(url, jsonObject) {
       }
       throw new Error('HTTP status ' + response.status);
     })
-    .catch(error => notifyUtils.notifyError(`Failed to execute POST ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${url}.`, error));
 }
 
 export function get(url) {
@@ -41,5 +41,5 @@ export function get(url) {
       }
       return response.json();
     })
-    .catch(error => notifyUtils.notifyError(`Failed to execute GET ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute GET ${url}.`, error));
 }

@@ -26,7 +26,12 @@ public class MainBasePage : BasePage
     }
 
     public List<string> TodoItemNames => Browser.Driver
-        .FindElements(By.CssSelector(".se-todo-items-data-grid .dx-datagrid .dx-data-row td[aria-colindex='2']")).Select(x => x.Text).ToList();
+        .FindElements(By.CssSelector(".se-todo-items-data-grid .dx-datagrid .dx-data-row td[aria-colindex='2']"))
+        .Select(x => x.Text)
+        .ToList();
 
-    public List<String> ErrorMessages { get; } = new() { "foo" };
+    public List<String> ErrorMessages => Browser.Driver
+        .FindElements(By.CssSelector(".dx-toast-content"))
+        .Select(x => x.Text)
+        .ToList();
 }
