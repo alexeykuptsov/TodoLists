@@ -17,6 +17,7 @@
           :show-borders="true"
           :show-column-headers="false"
           :focused-row-enabled="true"
+          :focused-row-index="projectsDataGridFocusedRowIndex"
           :auto-navigate-to-focused-row="true"
           v-model:focused-row-key="focusedRowKey"
           @focused-row-changed="onFocusedRowChanged"
@@ -66,7 +67,7 @@
               mode="cell"
           />
           <DxColumn data-field="isComplete" data-type="boolean" :width="40" />
-          <DxColumn data-field="title" />
+          <DxColumn data-field="name" />
         </DxDataGrid>
       </pane>
     </splitpanes>
@@ -81,7 +82,6 @@ import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from 'devextreme-vue/dat
 import { confirm } from 'devextreme/ui/dialog';
 import * as notifyUtils from '../utils/notifyUtils';
 import * as fetchUtils from '../utils/fetchUtils';
-import {notifyValidationError} from "../utils/notifyUtils";
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
 const projectsDataGridRefKey = 'projects-data-grid';
@@ -109,6 +109,7 @@ export default {
       projectsUri: 'api/Projects',
       focusedRowKey: null,
       projectName: null,
+      projectsDataGridFocusedRowIndex: -1,
     };
   },
   computed: {
@@ -204,7 +205,7 @@ export default {
       data.forEach(item => {
         this.todoItems.push({
           id: item.id,
-          title: item.name,
+          name: item.name,
           isComplete: item.isComplete,
         });
       });
@@ -226,12 +227,12 @@ export default {
       // this.projectsDataSource.store().load();
       this.projectsDataGrid.refresh()
         .done(() => {
-          this.focusedRowKey = data[0];
+          this.projectsDataGridFocusedRowIndex = 0;
         });
     },
     onFocusedRowChanged(e) {
       this.focusedRowKey = e.component.option('focusedRowKey');
-      this.projectName = this.projects.filter(x => x.id === this.focusedRowKey.id)[0].name;
+      this.projectName = e.row != null && e.row.data != null ? e.row.data.name : null;
     },
   }
 }

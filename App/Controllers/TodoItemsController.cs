@@ -131,7 +131,7 @@ public class TodoItemsController : ControllerBase
                     await myListsDbContext.TodoItems.Where(x => x.Id == id).
                         ExecuteUpdateAsync(x => x.SetProperty(t => t.IsComplete, propertyValue));
                 }
-                if (propertyName == "title")
+                if (propertyName == "name")
                 {
                     string propertyValue = property.Value.GetString();
                     await myListsDbContext.TodoItems.Where(x => x.Id == id).

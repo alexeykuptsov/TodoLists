@@ -25,11 +25,10 @@ namespace TodoLists.App.Controllers
             return await myListsDbContext.Profiles.ToListAsync();
         }
 
-        [HttpGet("Count")]
-        public async Task<ActionResult> GetProfilesCount()
+        [HttpGet("MaxId")]
+        public async Task<ActionResult> GetMaxId()
         {
-            var profilesCount = await myListsDbContext.Profiles.CountAsync();
-            return Ok(profilesCount);
+            return Ok(await myListsDbContext.Profiles.MaxAsync(x => x.Id));
         }
 
         // GET: api/Profiles/5

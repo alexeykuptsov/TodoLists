@@ -44,9 +44,9 @@ public class TestDataBuilder
 
     private static async Task<int> GetProfilesCountAsync(HttpClient superUserHttpClient)
     {
-        var response = await superUserHttpClient.GetAsync("api/Profiles/Count");
+        var response = await superUserHttpClient.GetAsync("api/Profiles/MaxId");
         response.EnsureSuccessStatusCode();
-        var profileNumber = int.Parse(await response.Content.ReadAsStringAsync());
+        var profileNumber = int.Parse(await response.Content.ReadAsStringAsync()) + 1;
         return profileNumber;
     }
 
