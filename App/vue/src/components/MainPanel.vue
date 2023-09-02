@@ -19,6 +19,7 @@
           :focused-row-enabled="true"
           :focused-row-index="projectsDataGridFocusedRowIndex"
           :auto-navigate-to-focused-row="true"
+          :new-row-position="newRowPosition"
           v-model:focused-row-key="focusedRowKey"
           @focused-row-changed="onFocusedRowChanged"
           @saving="projectsDataGrid_onSaving"
@@ -108,8 +109,10 @@ export default {
       uri: 'api/TodoItems',
       projectsUri: 'api/Projects',
       focusedRowKey: null,
+      projectId: null,
       projectName: null,
       projectsDataGridFocusedRowIndex: -1,
+      newRowPosition: "last",
     };
   },
   computed: {
@@ -138,22 +141,25 @@ export default {
       const addNameTextBox = document.getElementById('add-name');
 
       const item = {
+        projectId: this.projectId,
+        name: addNameTextBox.value.trim(),
         isComplete: false,
-        name: addNameTextBox.value.trim()
       };
 
       fetchUtils.post(this.uri, item)
-        .then(() => {
-          this.refreshPageData();
+        .then(response => {
+          this.refreshTodoItems();
           addNameTextBox.value = '';
         });
     },
     refreshPageData() {
-      fetchUtils.get(this.uri).then(data => {
-        this._displayItems(data);
-      });
       fetchUtils.get(this.projectsUri).then(data => {
         this._displayProjects(data);
+      });
+    },
+    refreshTodoItems() {
+      fetchUtils.get(this.uri + '?projectId=' + this.projectId).then(data => {
+        this._displayItems(data);
       });
     },
     deleteItem(id) {
@@ -171,11 +177,10 @@ export default {
         .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
     },
     projectsDataGrid_onSaving(e) {
-      fetch(this.projectsUri, {
-        method: 'PATCH',
-        headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
-        body: JSON.stringify(e.changes),
-      })
+      fetchUtils.patch(this.projectsUri, e.changes)
+        .then(() => {
+          this.refreshPageData()
+        })
         .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
     },
     projectsDataGrid_onRowRemoving(e) {
@@ -232,7 +237,9 @@ export default {
     },
     onFocusedRowChanged(e) {
       this.focusedRowKey = e.component.option('focusedRowKey');
+      this.projectId = e.row != null && e.row.data != null ? e.row.data.id : null;
       this.projectName = e.row != null && e.row.data != null ? e.row.data.name : null;
+      this.refreshTodoItems();
     },
   }
 }

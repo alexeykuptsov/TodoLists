@@ -3,6 +3,8 @@ using EasyExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using TodoLists.App.Entities;
 using TodoLists.App.Models;
@@ -25,12 +27,15 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects()
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects([FromQuery] string? projectName)
     {
-        return await myListsDbContext.Projects
+        var allProjects = await myListsDbContext.Projects
             .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
             .Select(x => ItemToDto(x))
             .ToListAsync();
+        if (projectName != null)
+            return allProjects.Where(x => x.Name == projectName).ToList();
+        return allProjects;
     }
 
     [HttpGet("{id}")]
@@ -105,26 +110,33 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<IActionResult> PatchProject([FromBody] JsonElement body)
+    public async Task<ActionResult<string>> PatchProject([FromBody] JsonElement body)
     {
         return await WithExceptionHandling(async () =>
         {
+            var rows = new JArray();
             foreach (var change in body.EnumerateArray())
             {
                 var changeType = change.GetProperty("type").GetString();
                 var data = change.GetProperty("data");
+                long? id;
                 switch (changeType)
                 {
                     case "insert":
-                        await InsertProject(data);
+                        id = await InsertProject(data);
                         break;
                     case "update":
-                        long id = change.GetProperty("key").GetProperty("id").GetInt64();
-                        await UpdateProject(data, id);
+                        id = change.GetProperty("key").GetProperty("id").GetInt64();
+                        await UpdateProject(data, id.Value);
                         break;
+                    default:
+                        throw new InvalidOperationException();
                 }
+
+                rows.Add(new JObject { { "id", id } });
             }
-            return Ok();
+
+            return Ok(JsonConvert.SerializeObject(new JObject { { "rows", rows } }));
         });
     }
 
@@ -143,14 +155,16 @@ public class ProjectsController : ControllerBase
         }
     }
 
-    private async Task InsertProject(JsonElement data)
+    private async Task<long> InsertProject(JsonElement data)
     {
-        await myListsDbContext.Projects.AddAsync(new Project
+        var entity = new Project
         {
             ProfileId = myUserService.GetCurrentUserProfileId(),
             Name = data.GetProperty("name").GetString(),
-        });
+        };
+        await myListsDbContext.Projects.AddAsync(entity);
         await myListsDbContext.SaveChangesAsync();
+        return entity.Id;
     }
 
     private static async Task<T> WithExceptionHandling<T>(Func<Task<T>> action)

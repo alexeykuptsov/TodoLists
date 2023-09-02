@@ -2,7 +2,7 @@
 using OpenQA.Selenium;
 using TodoLists.Utils;
 
-namespace TodoLists.Tests.Integration.PageObject;
+namespace TodoLists.Tests.Integration.PageObject.Elements;
 
 public class BaseElement
 {

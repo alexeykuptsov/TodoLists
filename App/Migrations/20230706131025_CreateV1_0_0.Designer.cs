@@ -11,7 +11,7 @@ using TodoLists.App.Entities;
 namespace TodoLists.App.Migrations
 {
     [DbContext(typeof(TodoListsDbContext))]
-    [Migration("20230706131025_CreateV1_0_0")]
+    [Migration("20230902085529_CreateV1_0_0")]
     partial class CreateV100
     {
         /// <inheritdoc />
@@ -138,11 +138,18 @@ namespace TodoLists.App.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("profile_id");
 
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("project_id");
+
                     b.HasKey("Id")
                         .HasName("pk_todo_items");
 
                     b.HasIndex("ProfileId")
                         .HasDatabaseName("ix_todo_items_profile_id");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_todo_items_project_id");
 
                     b.ToTable("todo_items", (string)null);
                 });
@@ -211,7 +218,16 @@ namespace TodoLists.App.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_todo_items_profiles_profile_id");
 
+                    b.HasOne("TodoLists.App.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_todo_items_projects_project_id");
+
                     b.Navigation("Profile");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("TodoLists.App.Entities.User", b =>

@@ -23,12 +23,14 @@ public class TodoItemsController : ControllerBase
 
     // GET: api/TodoItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems()
+    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems([FromQuery] long projectId)
     {
-        return await myListsDbContext.TodoItems
+        var result = await myListsDbContext.TodoItems
             .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
+            .Where(x => x.ProjectId == projectId)
             .Select(x => ItemToDto(x))
             .ToListAsync();
+        return result;
     }
 
     // GET: api/TodoItems/5
@@ -64,6 +66,7 @@ public class TodoItemsController : ControllerBase
             return NotFound();
         }
 
+        todoItem.ProjectId = todoDto.ProjectId;
         todoItem.Name = todoDto.Name;
         todoItem.IsComplete = todoDto.IsComplete;
 
@@ -88,7 +91,8 @@ public class TodoItemsController : ControllerBase
     {
         var todoItem = new TodoItem
         {
-            Profile = await myListsDbContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
+            ProfileId = myUserService.GetCurrentUserProfileId(),
+            ProjectId = todoDto.ProjectId,
             IsComplete = todoDto.IsComplete,
             Name = todoDto.Name,
         };

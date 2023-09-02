@@ -26,7 +26,7 @@ public class Browser : IDisposable
         Driver.Dispose();
     }
 
-    public MainBasePage OpenSiteAndLogin(string profileName, string username)
+    public MainPage OpenSiteAndLogin(string profileName, string username)
     {
         Driver.Url = "https://localhost:7147/";
         var loginPopoverLinkElement = Driver.FindElement(By.Id("loginPopoverLink"));
@@ -39,7 +39,7 @@ public class Browser : IDisposable
         Driver.FindElement(By.XPath("//input[@name='password']")).SendKeys("pass");
         Driver.FindElement(By.Id("login-button")).Click();
 
-        var mainPage = new MainBasePage(this);
+        var mainPage = new MainPage(this);
         mainPage.WaitUntilLoaded();
         return mainPage;
     }

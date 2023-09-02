@@ -1,5 +1,6 @@
-using TodoLists.Tests.Integration.Arranging;
-using TodoLists.Tests.Integration.PageObject;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace TodoLists.Tests.Integration
 {
@@ -44,16 +45,16 @@ namespace TodoLists.Tests.Integration
             var username = "kevin";
             var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
             using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
-            await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
+            var projectId = await GetInboxProjectId(httpClient);
+            await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
             browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
 
             mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Click();
             mainPage.RefreshPage();
-            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
-                
-            Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
+
+            browser.WaitAndAssertThat(() => mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
         }
 
         [Test]
@@ -62,7 +63,8 @@ namespace TodoLists.Tests.Integration
             var username = "kevin";
             var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
             using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
-            await TestDataBuilder.CreateTodoItemAsync("foo", false, httpClient);
+            var projectId = await GetInboxProjectId(httpClient);
+            await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
             using var browser = new Browser();
             var mainPage = browser.OpenSiteAndLogin(profileName, username);
             browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
@@ -75,6 +77,14 @@ namespace TodoLists.Tests.Integration
             browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
                 
             Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Text, Is.EqualTo("bar"));
+        }
+
+        private async Task<long> GetInboxProjectId(HttpClient httpClient)
+        {
+            var response = await httpClient.GetAsync("api/Projects?projectName=Inbox");
+            response.EnsureSuccessStatusCode();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JArray.Parse(responseContent)[0]["id"]!.Value<long>();
         }
     }
 }

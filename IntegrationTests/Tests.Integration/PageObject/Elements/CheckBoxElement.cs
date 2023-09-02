@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace TodoLists.Tests.Integration.PageObject;
+namespace TodoLists.Tests.Integration.PageObject.Elements;
 
 public class CheckBoxElement : BaseElement
 {
