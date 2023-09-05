@@ -7,6 +7,7 @@ public static class TestsDecorators
         string profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync();
         using var browser = new Browser();
         var mainPage = browser.OpenSiteAndLogin(profileName, TestDataBuilder.DefaultUserName);
+        mainPage.WaitUntilLoaded();
         await asyncAction(new TestContext(profileName, browser, mainPage));
     }
     

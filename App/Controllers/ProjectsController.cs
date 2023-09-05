@@ -118,16 +118,15 @@ public class ProjectsController : ControllerBase
             foreach (var change in body.EnumerateArray())
             {
                 var changeType = change.GetProperty("type").GetString();
-                var data = change.GetProperty("data");
                 long? id;
                 switch (changeType)
                 {
                     case "insert":
-                        id = await InsertProject(data);
+                        id = await InsertProject(change.GetProperty("data"));
                         break;
                     case "update":
                         id = change.GetProperty("key").GetProperty("id").GetInt64();
-                        await UpdateProject(data, id.Value);
+                        await UpdateProject(change.GetProperty("data"), id.Value);
                         break;
                     default:
                         throw new InvalidOperationException();

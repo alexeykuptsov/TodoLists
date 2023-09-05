@@ -5,38 +5,9 @@
     </div>
     <splitpanes id="main-splitpanes" class="default-theme">
       <pane min-size="20" size="30">
-        <h3>Projects</h3>
-
-        <DxDataGrid
-          :class="{ 'se-projects-data-grid': true }"
-          :ref="projectsDataGridRefKey"
-          :data-source="projects"
-          :remote-operations="false"
-          :allow-column-reordering="true"
-          :row-alternation-enabled="true"
-          :show-borders="true"
-          :show-column-headers="false"
-          :focused-row-enabled="true"
-          :focused-row-index="projectsDataGridFocusedRowIndex"
-          :auto-navigate-to-focused-row="true"
-          :new-row-position="newRowPosition"
-          v-model:focused-row-key="focusedRowKey"
-          @focused-row-changed="onFocusedRowChanged"
-          @saving="projectsDataGrid_onSaving"
-          @row-removing="projectsDataGrid_onRowRemoving"
-        >
-          <DxEditing
-            :allow-updating="true"
-            :allow-deleting="true"
-            :allow-adding="true"
-            mode="row"
-            :confirm-delete="false"
-          />
-          <DxRowDragging
-            :allow-reordering="true"
-          />
-          <DxColumn data-field="name" />
-        </DxDataGrid>
+        <ProjectsPanel
+          @focused-project-changed="onFocusedProjectChanged"
+        />
       </pane>
       <pane min-size="20">
         <div>
@@ -60,7 +31,6 @@
             :row-alternation-enabled="true"
             :show-borders="true"
             :show-column-headers="false"
-            v-model:focused-row-key="focusedRowKey"
             @saving="onSaving"
         >
           <DxEditing
@@ -79,13 +49,12 @@
 import $ from 'jquery';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from 'devextreme-vue/data-grid';
-import { confirm } from 'devextreme/ui/dialog';
+import {DxColumn, DxDataGrid, DxEditing} from 'devextreme-vue/data-grid';
 import * as notifyUtils from '../utils/notifyUtils';
 import * as fetchUtils from '../utils/fetchUtils';
+import ProjectsPanel from "@/components/MainPage/ProjectsPanel.vue";
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
-const projectsDataGridRefKey = 'projects-data-grid';
 
 export default {
   name: 'MainPanel',
@@ -93,39 +62,29 @@ export default {
     userName: String
   },
   components: {
+    ProjectsPanel,
     Splitpanes,
     Pane,
     DxDataGrid,
     DxColumn,
     DxEditing,
-    DxRowDragging,
   },
   data() {
     return {
-      projects: [],
       todoItems: [],
       todoItemsDataGridRefKey,
-      projectsDataGridRefKey,
       uri: 'api/TodoItems',
-      projectsUri: 'api/Projects',
-      focusedRowKey: null,
       projectId: null,
       projectName: null,
-      projectsDataGridFocusedRowIndex: -1,
-      newRowPosition: "last",
     };
   },
   computed: {
     todoItemsDataGrid: function() {
       return this.$refs[todoItemsDataGridRefKey].instance;
     },
-    projectsDataGrid: function() {
-      return this.$refs[projectsDataGridRefKey].instance;
-    },
   },
   mounted() {
     this.$nextTick(function () {
-      this.refreshPageData();
       adjustElementSizes();
       window.addEventListener("resize", this.windowResizeHandler);
     });
@@ -147,26 +106,15 @@ export default {
       };
 
       fetchUtils.post(this.uri, item)
-        .then(response => {
+        .then(() => {
           this.refreshTodoItems();
           addNameTextBox.value = '';
         });
-    },
-    refreshPageData() {
-      fetchUtils.get(this.projectsUri).then(data => {
-        this._displayProjects(data);
-      });
     },
     refreshTodoItems() {
       fetchUtils.get(this.uri + '?projectId=' + this.projectId).then(data => {
         this._displayItems(data);
       });
-    },
-    deleteItem(id) {
-      let authToken = localStorage.getItem('authToken');
-      fetch(`${this.uri}/${id}`, {method: 'DELETE', headers: {'Authorization': 'Bearer ' + authToken}})
-          .then(() => this.refreshPageData())
-          .catch(error => notifyUtils.notifySystemError('Unable to delete item.', error));
     },
     onSaving(e) {
       fetch(this.uri, {
@@ -175,33 +123,6 @@ export default {
         body: JSON.stringify(e.changes),
       })
         .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
-    },
-    projectsDataGrid_onSaving(e) {
-      fetchUtils.patch(this.projectsUri, e.changes)
-        .then(() => {
-          this.refreshPageData()
-        })
-        .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
-    },
-    projectsDataGrid_onRowRemoving(e) {
-      if (this.projects.length === 1)
-      {
-        notifyUtils.notifyValidationError(
-          'It is impossible to delete the last project. There should be at least one.', 'Error');
-        e.cancel = true;
-        return;
-      }
-
-      let index = e.component.getRowIndexByKey(e.key);
-      let rowEl = e.component.getRowElement(index);
-
-      let res = confirm("Do you really want to delete a record with key:" + e.key, "Warning");
-
-      e.cancel = new Promise((resolve, reject) => {
-        res.then((dialogResult) => {
-          resolve(!dialogResult)
-        });
-      })
     },
     _displayItems(data) {
       _displayCount(data.length);
@@ -220,23 +141,7 @@ export default {
           document.getElementById('se-ajax-load-status').innerText = 'complete';
         });
     },
-    _displayProjects(data) {
-
-      this.projects.splice(0);
-      data.forEach(item => {
-        this.projects.push({
-          id: item.id,
-          name: item.name,
-        });
-      });
-      // this.projectsDataSource.store().load();
-      this.projectsDataGrid.refresh()
-        .done(() => {
-          this.projectsDataGridFocusedRowIndex = 0;
-        });
-    },
-    onFocusedRowChanged(e) {
-      this.focusedRowKey = e.component.option('focusedRowKey');
+    onFocusedProjectChanged(e) {
       this.projectId = e.row != null && e.row.data != null ? e.row.data.id : null;
       this.projectName = e.row != null && e.row.data != null ? e.row.data.name : null;
       this.refreshTodoItems();
