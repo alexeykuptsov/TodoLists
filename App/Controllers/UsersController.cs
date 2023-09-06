@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using TodoLists.App.Entities;
 using TodoLists.App.Models;
 using TodoLists.App.Utils;
 
@@ -12,20 +13,20 @@ namespace TodoLists.App.Controllers;
 [Authorize(Roles = "superuser")]
 public class UsersController : Controller
 {
-    private readonly TodoContext myContext;
+    private readonly TodoListsDbContext myListsDbContext;
 
-    public UsersController(TodoContext context)
+    public UsersController(TodoListsDbContext listsDbContext)
     {
-        myContext = context;
+        myListsDbContext = listsDbContext;
     }
 
     [HttpPost("register")]
     public async Task<ActionResult> Register(UserDto request)
     {
-        var profile = myContext.Profiles.Single(x => x.Name == request.Profile);
+        var profile = myListsDbContext.Profiles.Single(x => x.Name == request.Profile);
         var (passwordHash, passwordSalt) = PasswordHashUtils.CreatePasswordHash(request.Password);
 
-        await myContext.Users.AddAsync(new User
+        await myListsDbContext.Users.AddAsync(new User
         {
             Profile = profile,
             Username = request.Username,
@@ -35,7 +36,7 @@ public class UsersController : Controller
         });
         try
         {
-            await myContext.SaveChangesAsync();
+            await myListsDbContext.SaveChangesAsync();
         }
         catch (DbUpdateException e)
         {

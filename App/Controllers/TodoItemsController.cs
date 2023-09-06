@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TodoLists.App.Entities;
 using TodoLists.App.Models;
 using TodoLists.App.Services;
 
@@ -11,22 +12,25 @@ namespace TodoLists.App.Controllers;
 [Authorize]
 public class TodoItemsController : ControllerBase
 {
-    private readonly TodoContext myContext;
+    private readonly TodoListsDbContext myListsDbContext;
     private readonly IUserService myUserService;
 
-    public TodoItemsController(TodoContext context, IUserService userService)
+    public TodoItemsController(TodoListsDbContext listsDbContext, IUserService userService)
     {
-        myContext = context;
+        myListsDbContext = listsDbContext;
         myUserService = userService;
     }
 
     // GET: api/TodoItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems()
+    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodoItems([FromQuery] long projectId)
     {
-        return await myContext.TodoItems
+        var result = await myListsDbContext.TodoItems
+            .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
+            .Where(x => x.ProjectId == projectId)
             .Select(x => ItemToDto(x))
             .ToListAsync();
+        return result;
     }
 
     // GET: api/TodoItems/5
@@ -34,7 +38,7 @@ public class TodoItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoItemDto>> GetTodoItem(long id)
     {
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
 
         if (todoItem == null)
         {
@@ -49,25 +53,26 @@ public class TodoItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Update>
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutTodoItem(long id, TodoItemDto todoDTO)
+    public async Task<IActionResult> PutTodoItem(long id, TodoItemDto todoDto)
     {
-        if (id != todoDTO.Id)
+        if (id != todoDto.Id)
         {
             return BadRequest();
         }
 
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
         }
 
-        todoItem.Name = todoDTO.Name;
-        todoItem.IsComplete = todoDTO.IsComplete;
+        todoItem.ProjectId = todoDto.ProjectId;
+        todoItem.Name = todoDto.Name;
+        todoItem.IsComplete = todoDto.IsComplete;
 
         try
         {
-            await myContext.SaveChangesAsync();
+            await myListsDbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
         {
@@ -82,19 +87,20 @@ public class TodoItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Create>
     [HttpPost]
-    public async Task<ActionResult<TodoItemDto>> PostTodoItem(TodoItemDto todoDto)
+    public async Task<IActionResult> PostTodoItem(TodoItemDto todoDto)
     {
         var todoItem = new TodoItem
         {
-            Profile = await myContext.Profiles.SingleAsync(x => x.Name == myUserService.GetCurrentUserProfileName()),
+            ProfileId = myUserService.GetCurrentUserProfileId(),
+            ProjectId = todoDto.ProjectId,
             IsComplete = todoDto.IsComplete,
             Name = todoDto.Name,
         };
 
-        myContext.TodoItems.Add(todoItem);
-        await myContext.SaveChangesAsync();
+        myListsDbContext.TodoItems.Add(todoItem);
+        await myListsDbContext.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, ItemToDto(todoItem));
+        return Ok();
     }
     // </snippet_Create>
 
@@ -102,21 +108,47 @@ public class TodoItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(long id)
     {
-        var todoItem = await myContext.TodoItems.FindAsync(id);
+        var todoItem = await myListsDbContext.TodoItems.FindAsync(id);
         if (todoItem == null)
         {
             return NotFound();
         }
 
-        myContext.TodoItems.Remove(todoItem);
-        await myContext.SaveChangesAsync();
+        myListsDbContext.TodoItems.Remove(todoItem);
+        await myListsDbContext.SaveChangesAsync();
 
-        return NoContent();
+        return Ok();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> PatchTodoItem([FromBody] dynamic body)
+    {
+        foreach (dynamic change in body.EnumerateArray())
+        {
+            long id = change.GetProperty("key").GetProperty("id").GetInt64();
+            foreach (dynamic property in change.GetProperty("data").EnumerateObject())
+            {
+                string propertyName = property.Name;
+                if (propertyName == "isComplete")
+                {
+                    bool propertyValue = property.Value.GetBoolean();
+                    await myListsDbContext.TodoItems.Where(x => x.Id == id).
+                        ExecuteUpdateAsync(x => x.SetProperty(t => t.IsComplete, propertyValue));
+                }
+                if (propertyName == "name")
+                {
+                    string propertyValue = property.Value.GetString();
+                    await myListsDbContext.TodoItems.Where(x => x.Id == id).
+                        ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
+                }
+            }
+        }
+        return Ok();
     }
 
     private bool TodoItemExists(long id)
     {
-        return myContext.TodoItems.Any(e => e.Id == id);
+        return myListsDbContext.TodoItems.Any(e => e.Id == id);
     }
 
     private static TodoItemDto ItemToDto(TodoItem todoItem) =>

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
-using TodoLists.App.Models;
+using TodoLists.App.Entities;
 
 namespace TodoLists.App.Controllers
 {
@@ -11,25 +11,31 @@ namespace TodoLists.App.Controllers
     [Authorize(Roles = "superuser")]
     public class ProfilesController : ControllerBase
     {
-        private readonly TodoContext myContext;
+        private readonly TodoListsDbContext myListsDbContext;
 
-        public ProfilesController(TodoContext context)
+        public ProfilesController(TodoListsDbContext listsDbContext)
         {
-            myContext = context;
+            myListsDbContext = listsDbContext;
         }
 
         // GET: api/Profiles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
         {
-            return await myContext.Profiles.ToListAsync();
+            return await myListsDbContext.Profiles.ToListAsync();
+        }
+
+        [HttpGet("MaxId")]
+        public async Task<ActionResult> GetMaxId()
+        {
+            return Ok(await myListsDbContext.Profiles.MaxAsync(x => x.Id));
         }
 
         // GET: api/Profiles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Profile>> GetProfile(long id)
         {
-            var profile = await myContext.Profiles.FindAsync(id);
+            var profile = await myListsDbContext.Profiles.FindAsync(id);
 
             if (profile == null)
             {
@@ -39,8 +45,6 @@ namespace TodoLists.App.Controllers
             return profile;
         }
 
-        // PUT: api/Profiles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfile(long id, Profile profile)
         {
@@ -54,11 +58,11 @@ namespace TodoLists.App.Controllers
                 Id = profile.Id,
                 Name = profile.Name,
             };
-            myContext.Entry(entry).State = EntityState.Modified;
+            myListsDbContext.Entry(entry).State = EntityState.Modified;
 
             try
             {
-                await myContext.SaveChangesAsync();
+                await myListsDbContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -75,24 +79,31 @@ namespace TodoLists.App.Controllers
             return NoContent();
         }
 
-        // POST: api/Profiles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Profile>> PostProfile(Profile profile)
         {
-            myContext.Profiles.Add(new Profile
+            var profileEntity = new Profile
             {
                 Name = profile.Name,
                 CreatedAt = SystemClock.Instance.GetCurrentInstant().ToUnixTimeMilliseconds(),
-            });
-            await myContext.SaveChangesAsync();
+            };
+            myListsDbContext.Profiles.Add(profileEntity);
+
+            var project = new Project
+            {
+                Name = "Inbox",
+                Profile = profileEntity,
+            };
+            myListsDbContext.Projects.Add(project);
+
+            await myListsDbContext.SaveChangesAsync();
 
             return CreatedAtAction("GetProfile", new { id = profile.Id }, profile);
         }
 
         private bool ProfileExists(long id)
         {
-            return (myContext.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
+            return myListsDbContext.Profiles.Any(e => e.Id == id);
         }
     }
 }

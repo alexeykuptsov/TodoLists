@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="EasyExceptions" Version="3.1.0" />
         <PackageReference Include="EFCore.NamingConventions" Version="7.0.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
@@ -33,4 +34,7 @@
       <Folder Include="Migrations" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Utils\Utils.csproj" />
+    </ItemGroup>
 </Project>

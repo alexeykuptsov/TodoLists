@@ -557,3 +557,8 @@ FodyWeavers.xsd
 appsettings.Development.json
 /pgsql
 /data
+
+.idea/**/dataSources.xml
+
+# Custom
+/wwwroot

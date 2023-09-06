@@ -1,7 +1,7 @@
 ﻿# To-Do Lists
 
-To-Do Lists in just another appllication for managing tasks with lists of check boxes.
-The app is implemented as an web application (ASP.NET Core 7 + Vue.js + DevExtreme) with a PostgreSQL database behind.
+To-Do Lists in just another application for managing tasks with lists of check boxes.
+The app is implemented as an web application (ASP.NET Core + Vue.js + DevExtreme) with a PostgreSQL database behind.
 Also there is a WPF launcher which is used to run the app and the database on Windows (in the same manner as pgAdmin is run).
 
 The purpose of the project is practicing with programming languages, technologies and libraries used in the app implementation.
@@ -10,7 +10,7 @@ The purpose of the project is practicing with programming languages, technologie
 
 _(to be implemented)_
 
-Unpack ZIP-archive.
+Download and unpack ZIP-archive.
 
 To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
 https://localhost:7147 in a browser.
@@ -25,6 +25,8 @@ Install Postgres 14, .NET 7 and JetBrains Rider (as a default IDE for this proje
 
 ```shell
 dotnet tool install --global dotnet-ef
+npm install -g @vue/cli
+npm install
 ```
 
 ```postgresql
@@ -34,6 +36,51 @@ create user todo_lists_app password 'pass' createdb;
 ```shell
 cd App
 dotnet ef database update
+```
+
+Also for proper running of Launcher you should set environment variable `TODO_LISTS_PGSQL_DIR` so that it refers to folder `pgsql` of unarchived
+[Postgres ZIP distributive](https://www.enterprisedb.com/download-postgresql-binaries).
+For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
+
+### Running in a Development Environment
+
+Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
+
+To apply vue project settings run in Terminal (`Alt+F12` in Rider):
+
+```shell
+cd App/vue
+npm run buildDevWatch
+```
+
+### Tests
+
+Integration tests (project `Tests.Integration`) are supposed to be run locally and the web app is running.
+For example, you may run configuration "App: index.html" and then run all tests from solution (`Ctrl+;,L` in Rider).
+
+### Working with Local Dev Database
+
+#### Drop and Create
+
+⚠
+The following script runs `database drop` so you need to close all connections to database `todo_lists`.
+
+```shell
+PS> cd App
+PS> .\LocalDevScripts\Drop_Create.ps1
+```
+
+#### Generate the Last Migration
+
+Before version 1.0.0 the last migration is the single one.
+So the script should be improved after the release.
+
+⚠
+The following script runs `database drop` so you need to close all connections to database `todo_lists`.
+
+```shell
+PS> cd App
+PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
 ```
 
 ### Branching strategy
@@ -49,28 +96,3 @@ The following personas are used in user stories bug tracking and implementation 
 *Kevin* uses To-Do Lists app hosted on his local machine.
 His OS is Windows.
 He installs the app by unpacking a ZIP distributive and following section Getting Started.
-
-### Working with Local Dev Database
-
-#### Drop and Create
-
-⚠
-The following script runs `database drop` so you need not close all connections to database `todo_lists`.
-
-```shell
-PS> cd App
-PS> .\LocalDevScripts\Drop_Create.ps1
-```
-
-#### Generate the Last Migration
-
-Before version 1.0.0 the last migration is the single one.
-So the script shall be improved after the release.
-
-⚠
-The following script runs `database drop` so you need not close all connections to database `todo_lists`.
-
-```shell
-PS> cd App
-PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
-```

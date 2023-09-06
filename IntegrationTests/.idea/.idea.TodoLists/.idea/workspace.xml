@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="20f32803-1a1c-48f0-8aa7-36b55f8c8058" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.TodoLists.Tests.Integration/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.TodoLists.Tests.Integration/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.TodoLists.Tests.Integration/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.TodoLists.Tests.Integration/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.TodoLists.Tests.Integration/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/Arranging/TestDataBuilder.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/BaseElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/BasePage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/Browser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/ButtonElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/CheckBoxElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/DataGridCellElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/DataGridElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/DataGridRowElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/LabelElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/MainBasePage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/PageObject/TextBoxElement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/ProjectsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/SmokeTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/Tests.Integration.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/TodoItemsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/Usings.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/Utils/NUnit/AssertSlim.That.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests.Integration/Utils/NUnit/AssertSlim.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TodoLists.Tests.Integration.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/Arranging/TestDataBuilder.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/BaseElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/BasePage.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/Browser.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/ButtonElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/CheckBoxElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/DataGridCellElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/DataGridElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/DataGridRowElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/LabelElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/MainBasePage.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/PageObject/TextBoxElement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/ProjectsTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/SmokeTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/Tests.Integration.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/TodoItemsTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/Usings.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/Utils/NUnit/AssertSlim.That.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests.Integration/Utils/NUnit/AssertSlim.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TodoLists.sln" beforeDir="false" afterPath="$PROJECT_DIR$/../TodoLists.sln" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ProjectId" id="2UiPiGHkjIJSgYiwzBKaJmR5Skp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\alxku\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache",
+      "C:\\Users\\alxku\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache",
+      "C:\\Users\\alxku\\AppData\\Local\\Symbols\\src"
+    ]
+  }
+}]]></component>
+  <component name="RunManager" selected="da0ceb26-f720-4f88-b2a0-ccc6ed100a01" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="20f32803-1a1c-48f0-8aa7-36b55f8c8058" name="Changes" comment="" />
+      <created>1693419553471</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1693419553471</updated>
+      <workItem from="1693419554688" duration="1294000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
