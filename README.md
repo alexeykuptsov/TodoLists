@@ -17,7 +17,7 @@ https://localhost:7147 in a browser.
 
 ## Development
 
-Kanban board: https://github.com/users/alexeykuptsov/projects/1/views/1
+Issues: [https://github.com/alexeykuptsov/TodoLists/issues](https://github.com/alexeykuptsov/TodoLists/issues)
 
 ### After-Checkout Development Environment Setup
 
