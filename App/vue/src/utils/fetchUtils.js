@@ -11,7 +11,7 @@ export function post(url, jsonObject) {
     body: JSON.stringify(jsonObject),
   })
     .then(assertSuccess)
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${url}.`, JSON.stringify(error)));
 }
 
 export function patch(url, jsonObject) {
@@ -26,7 +26,7 @@ export function patch(url, jsonObject) {
   })
     .then(assertSuccess)
     .then(response => response.json())
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute PATCH ${url}.`, error));
 }
 
 export function get(url) {
@@ -39,7 +39,7 @@ export function get(url) {
   })
     .then(assertSuccess)
     .then(response => response.json())
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute GET ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute GET ${url}.`, JSON.stringify(error)));
 }
 
 function assertSuccess(response) {

@@ -19,7 +19,7 @@ export function notifySystemError(message, error) {
         .text('Копировать текст ошибки');
       $rootDiv.append($copyLink);
 
-      element.append($rootDiv);
+      $(element).append($rootDiv);
     }
   };
   // noinspection JSCheckFunctionSignatures

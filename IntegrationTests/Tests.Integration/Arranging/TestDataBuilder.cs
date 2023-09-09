@@ -26,6 +26,14 @@ public class TestDataBuilder
         return httpClient;
     }
 
+    public static async Task CreateProjectAsync(string name, HttpClient httpClient)
+    {
+        var content = new StringContent($"{{\"name\":\"{name}\"}}");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        var response = await httpClient.PostAsync("api/Projects", content);
+        response.EnsureSuccessStatusCode();
+    }
+
     public static async Task CreateTodoItemAsync(long projectId, string todoItemName, bool isComplete, HttpClient httpClient)
     {
         var content =

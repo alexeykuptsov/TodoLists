@@ -29,8 +29,9 @@ public class BasePage
         });
     }
     
-    public void RefreshPage()
+    public void Refresh()
     {
+        Thread.Sleep(200); // To execute HTTP requests from event handlers like button clicks
         Browser.Driver.Url = Browser.Driver.Url;
         WaitUntilLoaded();
     }

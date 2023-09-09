@@ -11,8 +11,8 @@ public class ProjectsTests
 
       // Do nothing
             
-      tc.Browser.Wait.Until(_ => tc.MainPage.ProjectNameLabel.Text == "Inbox");
-      tc.Browser.Wait.Until(_ => tc.MainPage.TodoItemsDataGrid.Rows.Count == 0);
+      tc.Browser.Wait.Until(_ => tc.Page.ProjectNameLabel.Text == "Inbox");
+      tc.Browser.Wait.Until(_ => tc.Page.TodoItemsDataGrid.Rows.Count == 0);
     });
   }
 
@@ -23,13 +23,34 @@ public class ProjectsTests
     {
       // Keep default setup
 
-      tc.MainPage.ProjectsDataGrid.Rows[0].DeleteButton.Click();
+      tc.Page.ProjectsDataGrid.Rows[0].DeleteButton.Click();
 
       var expectedErrors = new[]
       {
         "It is impossible to delete the last project. There should be at least one.",
       };
-      tc.Browser.WaitAndAssertThat(() => tc.MainPage.ErrorMessages, Is.EquivalentTo(expectedErrors));
+      tc.Browser.WaitAndAssertThat(() => tc.Page.ErrorMessages, Is.EquivalentTo(expectedErrors));
+    });
+  }
+
+  [Test]
+  public async Task Delete02()
+  {
+    await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+    {
+      SetUpAsync = async tsc =>
+      {
+        var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+        tsc.CompositeDisposable.Add(httpClient);
+        await TestDataBuilder.CreateProjectAsync("Foo", httpClient);
+      },
+      Test = tc =>
+      {
+        tc.Page.ProjectsDataGrid.Rows[1].DeleteButton.Click();
+        tc.Page.Refresh();
+
+        tc.Browser.WaitAndAssertThat(() => tc.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text), Is.EqualTo(new[] { "Inbox" }));
+      },
     });
   }
   
@@ -40,32 +61,37 @@ public class ProjectsTests
     {
       // Keep default setup
 
-      tc.MainPage.ProjectsDataGrid.AddRowButton.Click();
-      tc.Browser.Wait.Until(_ => tc.MainPage.ProjectsDataGrid.Rows.Count == 2);
-      tc.MainPage.ProjectsDataGrid.TextEditor.Text = "Foo";
+      tc.Page.ProjectsDataGrid.AddRowButton.Click();
+      tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
+      tc.Page.ProjectsDataGrid.TextEditor.Text = "Foo";
 
-      tc.Browser.WaitAndAssertThat(() => tc.MainPage.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text), Is.EqualTo(new[] { "Inbox", "Foo" }));
+      tc.Browser.WaitAndAssertThat(
+        () => tc.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text),
+        Is.EqualTo(new[] { "Inbox", "Foo" }));
     });
   }
   
   [Test]
   public async Task MasterDetail01()
   {
-    await TestsDecorators.Default(async tc =>
+    await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
     {
-      // Add to-do item "foo"
-      tc.MainPage.AddTodoItemNameTextBox.Text = "foo";
-      tc.MainPage.AddTodoItemButton.Click();
-      tc.Browser.Wait.Until(_ => tc.MainPage.TodoItemNames.Count == 1);
-      // Add project "Bar"
-      tc.MainPage.ProjectsDataGrid.AddRowButton.Click();
-      tc.Browser.Wait.Until(_ => tc.MainPage.ProjectsDataGrid.Rows.Count == 2);
-      tc.MainPage.ProjectsDataGrid.TextEditor.Text = "Bar";
+      TestAsync = async tc =>
+      {
+        // Add to-do item "foo"
+        tc.Page.AddTodoItemNameTextBox.Text = "foo";
+        tc.Page.AddTodoItemButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.TodoItemNames.Count == 1);
+        // Add project "Bar"
+        tc.Page.ProjectsDataGrid.AddRowButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
+        tc.Page.ProjectsDataGrid.TextEditor.Text = "Bar";
 
-      await Task.Delay(500);
-      tc.MainPage.ProjectsDataGrid.Rows[1].Cells[1].Click();
+        await Task.Delay(500);
+        tc.Page.ProjectsDataGrid.Rows[1].Cells[1].Click();
 
-      tc.Browser.WaitAndAssertThat(() => tc.MainPage.TodoItemsDataGrid.Rows.Count, Is.EqualTo(0));
+        tc.Browser.WaitAndAssertThat(() => tc.Page.TodoItemsDataGrid.Rows.Count, Is.EqualTo(0));
+      },
     });
   }
 }

@@ -128,6 +128,8 @@ public class ProjectsController : ControllerBase
                         id = change.GetProperty("key").GetProperty("id").GetInt64();
                         await UpdateProject(change.GetProperty("data"), id.Value);
                         break;
+                    case "remove":
+                        throw new NotImplementedException();
                     default:
                         throw new InvalidOperationException();
                 }

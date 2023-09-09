@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace TodoLists.Tests.Integration
@@ -9,74 +7,86 @@ namespace TodoLists.Tests.Integration
         [Test]
         public async Task AddTest01()
         {
-            var username = "kevin";
-            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
-            using var browser = new Browser();
-            var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            await TestsDecorators.Default(tc =>
+            {
+                // Keep default setup
+
+                tc.Page.AddTodoItemNameTextBox.Text = "foo";
+                tc.Page.AddTodoItemButton.Click();
+                tc.Browser.Wait.Until(_ => tc.Page.TodoItemNames.Count == 1);
             
-            mainPage.AddTodoItemNameTextBox.Text = "foo";
-            mainPage.AddTodoItemButton.Click();
-            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
-            
-            Assert.That(mainPage.TodoItemNames, Is.EqualTo(new [] {"foo"}));
+                Assert.That(tc.Page.TodoItemNames, Is.EqualTo(new [] {"foo"}));
+            });
         }
 
         [Test]
         public async Task AddTest02()
         {
-            var username = "kevin";
-            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
-            using var browser = new Browser();
-            var mainPage = browser.OpenSiteAndLogin(profileName, username);
+            await TestsDecorators.Default(tc =>
+            {
+                // Keep default setup
+
+                tc.Page.AddTodoItemNameTextBox.Text = "foo";
+                tc.Page.AddTodoItemButton.Click();
+                tc.Browser.Wait.Until(_ => tc.Page.TodoItemNames.Count == 1);
+                tc.Page.AddTodoItemNameTextBox.Text = "bar";
+                tc.Page.AddTodoItemButton.Click();
+                tc.Browser.Wait.Until(_ => tc.Page.TodoItemNames.Count == 2);
             
-            mainPage.AddTodoItemNameTextBox.Text = "foo";
-            mainPage.AddTodoItemButton.Click();
-            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 1);
-            mainPage.AddTodoItemNameTextBox.Text = "bar";
-            mainPage.AddTodoItemButton.Click();
-            browser.Wait.Until(_ => mainPage.TodoItemNames.Count == 2);
-            
-            Assert.That(mainPage.TodoItemNames, Is.EqualTo(new [] {"foo", "bar"}));
+                Assert.That(tc.Page.TodoItemNames, Is.EqualTo(new [] {"foo", "bar"}));
+            });
         }
 
         [Test]
         public async Task UpdateTest01()
         {
-            var username = "kevin";
-            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
-            using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
-            var projectId = await GetInboxProjectId(httpClient);
-            await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
-            using var browser = new Browser();
-            var mainPage = browser.OpenSiteAndLogin(profileName, username);
-            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
+            await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+            {
+                SetUpAsync = async tsc =>
+                {
+                    var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+                    tsc.CompositeDisposable.Add(httpClient);
+                    var projectId = await GetInboxProjectId(httpClient);
+                    await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
+                },
+                Test = tc =>
+                {
+                    tc.Browser.Wait.Until(_ => tc.Page.TodoItemsDataGrid.Rows.Count == 1);
 
-            mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Click();
-            mainPage.RefreshPage();
+                    tc.Page.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Click();
+                    tc.Page.Refresh();
 
-            browser.WaitAndAssertThat(() => mainPage.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
+                    tc.Browser.WaitAndAssertThat(() => tc.Page.TodoItemsDataGrid.Rows[0].Cells[0].AsCheckBox().Checked, Is.True);
+                }
+            });
         }
 
         [Test]
         public async Task UpdateTest02()
         {
-            var username = "kevin";
-            var profileName = await TestDataBuilder.CreateProfileWithSingleUserAsync(username);
-            using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(profileName, username);
-            var projectId = await GetInboxProjectId(httpClient);
-            await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
-            using var browser = new Browser();
-            var mainPage = browser.OpenSiteAndLogin(profileName, username);
-            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
+            await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+            {
+                SetUpAsync = async tsc =>
+                {
+                    var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+                    tsc.CompositeDisposable.Add(httpClient);
+                    var projectId = await GetInboxProjectId(httpClient);
+                    await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
+                },
+                Test = tc =>
+                {
+                    tc.Browser.Wait.Until(_ => tc.Page.TodoItemsDataGrid.Rows.Count == 1);
             
-            var row = mainPage.TodoItemsDataGrid.Rows[0];
-            row.Cells[1].Click();
-            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox());
-            mainPage.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox().Text = "bar";
-            mainPage.RefreshPage();
-            browser.Wait.Until(_ => mainPage.TodoItemsDataGrid.Rows.Count == 1);
+                    var row = tc.Page.TodoItemsDataGrid.Rows[0];
+                    row.Cells[1].Click();
+                    tc.Browser.Wait.Until(_ => tc.Page.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox());
+                    tc.Page.TodoItemsDataGrid.Rows[0].Cells[1].AsTextBox().Text = "bar";
+                    tc.Page.Refresh();
+                    tc.Browser.Wait.Until(_ => tc.Page.TodoItemsDataGrid.Rows.Count == 1);
                 
-            Assert.That(mainPage.TodoItemsDataGrid.Rows[0].Cells[1].Text, Is.EqualTo("bar"));
+                    Assert.That(tc.Page.TodoItemsDataGrid.Rows[0].Cells[1].Text, Is.EqualTo("bar"));
+                },
+            });
         }
 
         private async Task<long> GetInboxProjectId(HttpClient httpClient)
