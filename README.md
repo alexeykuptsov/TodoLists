@@ -1,6 +1,6 @@
 ﻿# To-Do Lists
 
-To-Do Lists in just another application for managing tasks with lists of check boxes.
+To-Do Lists is just another application for managing tasks with lists of check boxes.
 The app is implemented as a web application (ASP.NET Core + Vue.js + DevExtreme) with a PostgreSQL database behind.
 Also there is a WPF launcher which is used to run the app and the database on Windows (in the same manner as pgAdmin is run).
 
@@ -15,9 +15,19 @@ Download and unpack ZIP-archive.
 To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
 https://localhost:7147 in a browser.
 
-## Development
+## Issue Tracking
 
 Issues: [https://github.com/alexeykuptsov/TodoLists/issues](https://github.com/alexeykuptsov/TodoLists/issues)
+
+### User Story Personas
+
+The following personas are used in user stories bug tracking and implementation of manual and automated tests.
+
+*Kevin* uses To-Do Lists app hosted on his local machine.
+His OS is Windows.
+He installs the app by unpacking a ZIP distributive and following section Getting Started.
+
+## Development
 
 ### After-Checkout Development Environment Setup
 
@@ -88,11 +98,3 @@ PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
 We use [Git Flow](http://danielkummer.github.io/git-flow-cheatsheet/index.html).
 
 We use classic merges and avoid rebasing, amend-committing and other Git commands that change history.
-
-### User Story Personas
-
-The following personas are used in user stories bug tracking and implementation of manual and automated tests.
-
-*Kevin* uses To-Do Lists app hosted on his local machine.
-His OS is Windows.
-He installs the app by unpacking a ZIP distributive and following section Getting Started.
