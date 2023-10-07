@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using TodoLists.Tests.Integration.PageObject.Elements;
+using TodoLists.Tests.Integration.PageObject.Elements.Dialogs;
 
 namespace TodoLists.Tests.Integration.PageObject;
 
@@ -10,6 +11,7 @@ public class MainPage : BasePage
     public DataGridElement ProjectsDataGrid { get; }
     public DataGridElement TodoItemsDataGrid { get; }
     public LabelElement ProjectNameLabel { get; } 
+    public DeleteDialogElement DeleteDialog { get; } 
 
     public MainPage(Browser browser) : base(browser)
     {
@@ -18,6 +20,7 @@ public class MainPage : BasePage
         ProjectsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-projects-data-grid") });
         TodoItemsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-todo-items-data-grid") });
         ProjectNameLabel = new LabelElement(Browser, new[] { By.CssSelector("#project-name") });
+        DeleteDialog = new DeleteDialogElement(Browser, new[] { By.CssSelector(".dx-dialog") });
     }
 
     public override void WaitUntilLoaded()

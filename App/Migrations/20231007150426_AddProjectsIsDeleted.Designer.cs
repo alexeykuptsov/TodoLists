@@ -11,8 +11,8 @@ using TodoLists.App.Entities;
 namespace TodoLists.App.Migrations
 {
     [DbContext(typeof(TodoListsDbContext))]
-    [Migration("20230902085529_CreateV1_0_0")]
-    partial class CreateV100
+    [Migration("20231007150426_AddProjectsIsDeleted")]
+    partial class AddProjectsIsDeleted
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,10 @@ namespace TodoLists.App.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Name")
                         .HasColumnType("text")

@@ -47,6 +47,9 @@ public class ProjectsTests
       Test = tc =>
       {
         tc.Page.ProjectsDataGrid.Rows[1].DeleteButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.DeleteDialog.Displayed && tc.Page.DeleteDialog.YesButton.Displayed);
+        tc.Page.DeleteDialog.YesButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 1);
         tc.Page.Refresh();
 
         tc.Browser.WaitAndAssertThat(() => tc.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text), Is.EqualTo(new[] { "Inbox" }));

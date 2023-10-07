@@ -46,7 +46,7 @@ public class TestDataBuilder
     private static async Task CreateUserAsync(string profileName, string username, HttpClient hHttpClient)
     {
         var content =
-            new StringContent($"{{\"profile\":\"{profileName}\",\"username\":\"{username}\",\"password\":\"pass\"}}");
+            new StringContent($"{{\"profile\":\"{profileName}\",\"username\":\"{username}\",\"password\":\"{username}\"}}");
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await hHttpClient.PostAsync("api/Users/register", content);
         response.EnsureSuccessStatusCode();
@@ -70,7 +70,7 @@ public class TestDataBuilder
 
     private static async Task AuthenticateSuperUser(HttpClient superUserHttpClient)
     {
-        var content = new StringContent("{\"username\":\"admin\",\"password\":\"pass\"}");
+        var content = new StringContent("{\"username\":\"admin\",\"password\":\"admin\"}");
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await superUserHttpClient.PostAsync("api/Auth/LoginSuperUser", content);
         response.EnsureSuccessStatusCode();
@@ -80,7 +80,7 @@ public class TestDataBuilder
 
     private static async Task AuthenticateUserAsync(HttpClient httpClient, string profileName, string username)
     {
-        var content = new StringContent($"{{\"profile\":\"{profileName}\",\"username\":\"{username}\",\"password\":\"pass\"}}");
+        var content = new StringContent($"{{\"profile\":\"{profileName}\",\"username\":\"{username}\",\"password\":\"{username}\"}}");
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await httpClient.PostAsync("api/Auth/Login", content);
         response.EnsureSuccessStatusCode();

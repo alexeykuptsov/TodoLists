@@ -31,11 +31,12 @@ He installs the app by unpacking a ZIP distributive and following section Gettin
 
 ### After-Checkout Development Environment Setup
 
-Install Postgres 14, .NET 7 and JetBrains Rider (as a default IDE for this project).
+Install Postgres 14, .NET 7, Node.js and JetBrains Rider (as a default IDE for this project).
 
 ```shell
 dotnet tool install --global dotnet-ef
 npm install -g @vue/cli
+cd App\vue
 npm install
 ```
 
@@ -80,17 +81,12 @@ PS> cd App
 PS> .\LocalDevScripts\Drop_Create.ps1
 ```
 
-#### Generate the Last Migration
-
-Before version 1.0.0 the last migration is the single one.
-So the script should be improved after the release.
-
-⚠
-The following script runs `database drop` so you need to close all connections to database `todo_lists`.
+#### Add Migration
 
 ```shell
 PS> cd App
-PS> .\LocalDevScripts\Drop_UpdateMigrations_Create.ps1
+PS> dotnet ef migrations add AddProjectsIsDeleted
+PS> dotnet ef database update
 ```
 
 ### Branching strategy

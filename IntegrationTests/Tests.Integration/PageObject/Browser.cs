@@ -19,6 +19,7 @@ public class Browser : IDisposable
             PollingInterval = TimeSpan.FromMilliseconds(200),
         };
         Wait.IgnoreExceptionTypes(typeof(AssertionException));
+        Wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
     }
 
     public void Dispose()
@@ -36,7 +37,7 @@ public class Browser : IDisposable
 
         Driver.FindElement(By.XPath("//input[@name='profile']")).SendKeys(profileName);
         Driver.FindElement(By.XPath("//input[@name='username']")).SendKeys(username);
-        Driver.FindElement(By.XPath("//input[@name='password']")).SendKeys("pass");
+        Driver.FindElement(By.XPath("//input[@name='password']")).SendKeys(username);
         Driver.FindElement(By.Id("login-button")).Click();
 
         var mainPage = new MainPage(this);

@@ -31,7 +31,8 @@ public class ProjectsController : ControllerBase
     {
         var allProjects = await myListsDbContext.Projects
             .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
-            .Select(x => ItemToDto(x))
+            .Where(x => !x.IsDeleted)
+            .Select(x => EntityToDto(x))
             .ToListAsync();
         if (projectName != null)
             return allProjects.Where(x => x.Name == projectName).ToList();
@@ -48,35 +49,7 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        return ItemToDto(project);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutProject(long id, ProjectDto projectDto)
-    {
-        if (id != projectDto.Id)
-        {
-            return BadRequest();
-        }
-
-        var project = await myListsDbContext.Projects.FindAsync(id);
-        if (project == null)
-        {
-            return NotFound();
-        }
-
-        project.Name = projectDto.Name;
-
-        try
-        {
-            await myListsDbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException) when (!ProjectExists(id))
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        return EntityToDto(project);
     }
 
     [HttpPost]
@@ -86,24 +59,10 @@ public class ProjectsController : ControllerBase
         {
             Profile = await myListsDbContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
             Name = projectDto.Name,
+            IsDeleted = projectDto.IsDeleted,
         };
 
         myListsDbContext.Projects.Add(project);
-        await myListsDbContext.SaveChangesAsync();
-
-        return Ok();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProject(long id)
-    {
-        var project = await myListsDbContext.Projects.FindAsync(id);
-        if (project == null)
-        {
-            return NotFound();
-        }
-
-        myListsDbContext.Projects.Remove(project);
         await myListsDbContext.SaveChangesAsync();
 
         return Ok();
@@ -129,7 +88,9 @@ public class ProjectsController : ControllerBase
                         await UpdateProject(change.GetProperty("data"), id.Value);
                         break;
                     case "remove":
-                        throw new NotImplementedException();
+                        id = change.GetProperty("key").GetProperty("id").GetInt64();
+                        await DeleteProject(id.Value);
+                        break;
                     default:
                         throw new InvalidOperationException();
                 }
@@ -154,6 +115,13 @@ public class ProjectsController : ControllerBase
                     .ExecuteUpdateAsync(x => x.SetProperty(t => t.Name, propertyValue));
             }
         }
+    }
+
+    private async Task DeleteProject(long id)
+    {
+        await myListsDbContext.Projects
+            .Where(x => x.Id == id && x.ProfileId == myUserService.GetCurrentUserProfileId())
+            .ExecuteUpdateAsync(x => x.SetProperty(t => t.IsDeleted, true));
     }
 
     private async Task<long> InsertProject(JsonElement data)
@@ -186,9 +154,10 @@ public class ProjectsController : ControllerBase
         return myListsDbContext.Projects.Any(e => e.Id == id);
     }
 
-    private static ProjectDto ItemToDto(Project project) => new()
+    private static ProjectDto EntityToDto(Project entity) => new()
     {
-        Id = project.Id,
-        Name = project.Name,
+        Id = entity.Id,
+        Name = entity.Name,
+        IsDeleted = entity.IsDeleted
     };
 }

@@ -9,6 +9,8 @@ public class BaseElement
     public Browser Browser { get; }
     public List<By> WebElementLocatorsChain { get; }
 
+    public virtual bool Displayed => FindElementByChain().Displayed;
+
     public BaseElement(Browser browser, IEnumerable<By> webElementLocatorsChain)
     {
         Browser = browser;

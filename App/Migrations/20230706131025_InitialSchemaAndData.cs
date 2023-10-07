@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TodoLists.App.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateV100 : Migration
+    public partial class InitialSchemaAndData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -144,6 +145,36 @@ namespace TodoLists.App.Migrations
                 table: "users",
                 columns: new[] { "profile_id", "username_lower_case" },
                 unique: true);
+
+            SeedLocalDevData(migrationBuilder);
+        }
+
+        private void SeedLocalDevData(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.InsertData(
+                "super_users",
+                new[] { "username", "username_lower_case", "password_hash", "password_salt" },
+                new object[]
+                {
+                    "admin",
+                    "admin",
+                    Convert.FromHexString("AC87E0C07F80E642396FD5F393B59498776F6BB0D8EC32821AB0C2D3C193A251B727980EA772C216BF81194BBBBA8C6B947D55ED7D9A4EA02C52919973EF3FDB"),
+                    Convert.FromHexString("DC54366BC7E3EA815035514D8929CF04898C8281FF1FAE51C443CF9AF5F04BB62E560E0D742B4486514A4A9A1CAF12A005110A52F70E795E1E5FF58108D5A6C2F5A3D9FBA7FE88B2C535A4C5C347DD9033FE670223090D7469FFD8632C8400F523E0246DC131E6F260EFEA18E683A9112461EC0DB787267A784B1A5B749DA9EF")
+                });
+            migrationBuilder.InsertData(
+                "profiles", new[] { "name", "created_at" }, new object[] { "dev", 1669497925237 });
+            migrationBuilder.InsertData("projects", new[] { "profile_id", "name" }, new object[] { 1, "Inbox" });
+            migrationBuilder.InsertData(
+                "users",
+                new[] { "profile_id", "username", "username_lower_case", "password_hash", "password_salt" },
+                new object[]
+                {
+                    1,
+                    "user",
+                    "user",
+                    Convert.FromHexString("2B2E2D28530F1127D97EC25C84894D64358AFCC840A73C3EAFC20F7DE256317384642962ACCE58B735FDC01A63EB59CC231DAD94A5622853B04496254BDE9EFA"),
+                    Convert.FromHexString("4AC0B7576779D25BFCAB3B322177541527466A0E0E2BB6AFC73A35199CD166EF487CCF907926A0D6200A8827E738209B2D1F03E4934E31012C67E02CE672772E9B9C997A787478D0C810F781FD2535BD1A722EA912C13E0D1C476DFD1D310AF076E537D9D1C7FA672F7B41F64435013E03337399D436CE8B9C7F358FA809B318")
+                });
         }
 
         /// <inheritdoc />

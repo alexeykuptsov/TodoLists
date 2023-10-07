@@ -27,7 +27,7 @@ public class SmokeTests
 
         chromeDriver.FindElement(By.XPath("//input[@name='profile']")).SendKeys("dev");
         chromeDriver.FindElement(By.XPath("//input[@name='username']")).SendKeys("user");
-        chromeDriver.FindElement(By.XPath("//input[@name='password']")).SendKeys("pass");
+        chromeDriver.FindElement(By.XPath("//input[@name='password']")).SendKeys("user");
         chromeDriver.FindElement(By.Id("login-button")).Click();
 
         wait.Until(d => d.FindElement(By.Id("se-user-name")));
