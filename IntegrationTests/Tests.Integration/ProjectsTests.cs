@@ -97,4 +97,28 @@ public class ProjectsTests
       },
     });
   }
+  
+  [Test]
+  public async Task Clone01()
+  {
+    await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+    {
+      SetUpAsync = async tsc =>
+      {
+        var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+        tsc.CompositeDisposable.Add(httpClient);
+        var projectId = await TestDataBuilder.CreateProjectAsync("Foo", httpClient);
+        await TestDataBuilder.CreateTodoItemAsync(projectId, "Bar", false, httpClient);
+        await TestDataBuilder.CreateTodoItemAsync(projectId, "Buz", true, httpClient);
+      },
+      Test = tc =>
+      {
+        tc.Page.ProjectsDataGrid.Rows[1].CloneButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 3);
+        tc.Page.Refresh();
+
+        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 3);
+      },
+    });
+  }
 }
