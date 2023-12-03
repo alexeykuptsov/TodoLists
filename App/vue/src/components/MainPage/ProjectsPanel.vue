@@ -1,5 +1,6 @@
 <script>
-import {DxColumn, DxDataGrid, DxEditing, DxRowDragging} from "devextreme-vue/data-grid";
+import {DxColumn, DxDataGrid, DxEditing, DxRowDragging, DxToolbar, DxItem} from "devextreme-vue/data-grid";
+import {DxButton} from "devextreme-vue/button";
 import * as fetchUtils from '@/utils/fetchUtils.js';
 import * as notifyUtils from "@/utils/notifyUtils";
 import {confirm} from "devextreme/ui/dialog";
@@ -14,6 +15,9 @@ export default {
     DxColumn,
     DxEditing,
     DxRowDragging,
+    DxToolbar,
+    DxItem,
+    DxButton,
   },
   data() {
     return {
@@ -22,6 +26,7 @@ export default {
       projectsUri: 'api/Projects',
       projectsDataGridFocusedRowIndex: -1,
       newRowPosition: "last",
+      focusedRow: null,
     };
   },
   computed: {
@@ -83,7 +88,12 @@ export default {
         });
     },
     onFocusedRowChanged(e) {
+      this.focusedRow = e.row.data;
       this.$emit('focused-project-changed', e)
+    },
+    cloneProject() {
+      const foo = this.focusedRow.id;
+      alert(foo);
     },
   }
 }
@@ -120,6 +130,23 @@ export default {
       :allow-reordering="true"
     />
     <DxColumn data-field="name"/>
+    <DxToolbar>
+      <DxItem
+        location="after"
+        template="cloneButton"
+      />
+      <DxItem
+        location="after"
+        name="addRowButton"
+      />
+    </DxToolbar>
+    <template #cloneButton>
+      <DxButton
+        :class="{ 'se-clone-button': true }"
+        icon="copy"
+        @click="cloneProject"
+      />
+    </template>
   </DxDataGrid>
 </template>
 

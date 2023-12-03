@@ -113,7 +113,8 @@ public class ProjectsTests
       },
       Test = tc =>
       {
-        tc.Page.ProjectsDataGrid.Rows[1].CloneButton.Click();
+        tc.Page.ProjectsDataGrid.Rows[1].Click();
+        tc.Page.ProjectsDataGrid.CloneButton.Click();
         tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 3);
         tc.Page.Refresh();
 

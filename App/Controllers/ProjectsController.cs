@@ -65,7 +65,7 @@ public class ProjectsController : ControllerBase
         myListsDbContext.Projects.Add(project);
         await myListsDbContext.SaveChangesAsync();
 
-        return Ok();
+        return Ok(project.Id);
     }
 
     [HttpPatch]

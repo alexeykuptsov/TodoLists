@@ -34,7 +34,7 @@ He installs the app by unpacking a ZIP distributive and following section Gettin
 Install Postgres 14, .NET 7, Node.js and JetBrains Rider (as a default IDE for this project).
 
 ```shell
-dotnet tool install --global dotnet-ef
+dotnet tool install --global dotnet-ef --version 8.0.0
 npm install -g @vue/cli
 cd App\vue
 npm install
@@ -57,7 +57,7 @@ For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
 Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
 
-To apply vue project settings run in Terminal (`Alt+F12` in Rider):
+To apply vue project changes on-the-fly run in Terminal (`Alt+F12` in Rider):
 
 ```shell
 cd App/vue
