@@ -114,11 +114,14 @@ public class ProjectsTests
       Test = tc =>
       {
         tc.Page.ProjectsDataGrid.Rows[1].Click();
+        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
         tc.Page.ProjectsDataGrid.CloneButton.Click();
-        tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 3);
         tc.Page.Refresh();
 
         tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 3);
+        Assert.That(tc.Page.ProjectsDataGrid.Rows[2].Cells[1].Text, Is.EqualTo("Foo"));
+        tc.Page.ProjectsDataGrid.Rows[2].Cells[1].Click();
+        tc.Browser.WaitAndAssertThat(() => tc.Page.TodoItemNames, Is.EqualTo(new [] {"Bar", "Buz"}));
       },
     });
   }

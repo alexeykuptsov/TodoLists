@@ -73,7 +73,6 @@ export default {
       })
     },
     _displayProjects(data) {
-
       this.projects.splice(0);
       data.forEach(item => {
         this.projects.push({
@@ -92,8 +91,9 @@ export default {
       this.$emit('focused-project-changed', e)
     },
     cloneProject() {
-      const foo = this.focusedRow.id;
-      alert(foo);
+      fetchUtils.post('api/Projects/clone', { id: this.focusedRow.id }).then(() => {
+        this.refreshData();
+      });
     },
   }
 }
