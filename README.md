@@ -41,7 +41,7 @@ npm install
 ```
 
 ```postgresql
-create user todo_lists_app password 'pass' createdb;
+create user dev__todo_lists_app password 'dev__todo_lists_app' createdb;
 ```
 
 ```shell

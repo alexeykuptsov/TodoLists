@@ -1,8 +1,11 @@
 ﻿import * as notifyUtils from "./notifyUtils";
+import { getConfig } from '@/config';
 
-export function post(url, jsonObject) {
+const config = getConfig();
+
+export function post(urlPath, jsonObject) {
   let authToken = localStorage.getItem('authToken');
-  return fetch(url, {
+  return fetch(config.apiBaseUrl + urlPath, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${authToken}`,
@@ -11,12 +14,12 @@ export function post(url, jsonObject) {
     body: JSON.stringify(jsonObject),
   })
     .then(assertSuccess)
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${url}.`, JSON.stringify(error)));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute POST ${urlPath}.`, JSON.stringify(error)));
 }
 
-export function patch(url, jsonObject) {
+export function patch(urlPath, jsonObject) {
   let authToken = localStorage.getItem('authToken');
-  return fetch(url, {
+  return fetch(config.apiBaseUrl + urlPath, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${authToken}`,
@@ -26,12 +29,12 @@ export function patch(url, jsonObject) {
   })
     .then(assertSuccess)
     .then(response => response.json())
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute PATCH ${url}.`, error));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute PATCH ${urlPath}.`, error));
 }
 
-export function get(url) {
+export function get(urlPath) {
   let authToken = localStorage.getItem('authToken');
-  return fetch(url, {
+  return fetch(config.apiBaseUrl + urlPath, {
     headers: {
       'Accept': 'application/json',
       'Authorization': `Bearer ${authToken}`,
@@ -39,7 +42,7 @@ export function get(url) {
   })
     .then(assertSuccess)
     .then(response => response.json())
-    .catch(error => notifyUtils.notifySystemError(`Failed to execute GET ${url}.`, JSON.stringify(error)));
+    .catch(error => notifyUtils.notifySystemError(`Failed to execute GET ${urlPath}.`, JSON.stringify(error)));
 }
 
 function assertSuccess(response) {

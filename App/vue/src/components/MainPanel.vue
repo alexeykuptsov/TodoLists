@@ -50,7 +50,6 @@ import $ from 'jquery';
 import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import {DxColumn, DxDataGrid, DxEditing} from 'devextreme-vue/data-grid';
-import * as notifyUtils from '../utils/notifyUtils';
 import * as fetchUtils from '../utils/fetchUtils';
 import ProjectsPanel from "@/components/MainPage/ProjectsPanel.vue";
 
@@ -73,7 +72,6 @@ export default {
     return {
       todoItems: [],
       todoItemsDataGridRefKey,
-      uri: 'api/TodoItems',
       projectId: null,
       projectName: null,
     };
@@ -105,24 +103,19 @@ export default {
         isComplete: false,
       };
 
-      fetchUtils.post(this.uri, item)
+      fetchUtils.post('api/TodoItems', item)
         .then(() => {
           this.refreshTodoItems();
           addNameTextBox.value = '';
         });
     },
     refreshTodoItems() {
-      fetchUtils.get(this.uri + '?projectId=' + this.projectId).then(data => {
+      fetchUtils.get(`api/TodoItems?projectId=${this.projectId}`).then(data => {
         this._displayItems(data);
       });
     },
     onSaving(e) {
-      fetch(this.uri, {
-        method: 'PATCH',
-        headers: {'Authorization': 'Bearer ' + localStorage.getItem('authToken'), 'Content-Type': 'application/json'},
-        body: JSON.stringify(e.changes),
-      })
-        .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
+      fetchUtils.patch(`api/TodoItems`, e.changes);
     },
     _displayItems(data) {
       _displayCount(data.length);

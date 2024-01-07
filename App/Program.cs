@@ -21,7 +21,14 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog();
+    builder.Host.UseSerilog((context, configuration) =>
+    {
+        configuration
+            .WriteTo.Console()
+            .WriteTo.File(
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? "../TodoLists.App.log" : "TodoLists.App.log",
+                rollingInterval: RollingInterval.Day);
+    });
 
     builder.Services.AddControllers();
     builder.Services.AddDbContext<TodoListsDbContext>(options =>
@@ -61,14 +68,20 @@ try
 
     var app = builder.Build();
 
+    string wwwrootDir;
+    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
     if (app.Environment.IsDevelopment())
     {
+        wwwrootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../wwwroot"));
+    }
+    else
+    {
+        wwwrootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "wwwroot"));
     }
 
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    var wwwrootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../wwwroot"));
     app.UseFileServer(new FileServerOptions
     {
         FileProvider = new PhysicalFileProvider(wwwrootDir),

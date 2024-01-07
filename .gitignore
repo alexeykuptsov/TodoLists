@@ -553,8 +553,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Нужно создавать из appsettings.Development.example.json
-appsettings.Development.json
 /pgsql
 /data
 
@@ -562,3 +560,5 @@ appsettings.Development.json
 
 # Custom
 /wwwroot
+appsettings.Production.json
+*.orig

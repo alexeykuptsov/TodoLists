@@ -14,6 +14,9 @@ import notify from 'devextreme/ui/notify';
 import Form from 'devextreme/ui/form';
 import Button from 'devextreme/ui/button';
 import Popover from 'devextreme/ui/popover';
+import { getConfig } from '@/config';
+
+const config = getConfig();
 
 export default {
   name: 'LoginButton',
@@ -94,7 +97,7 @@ export default {
 
           localStorage.setItem('loginForm.profile', userDto.profile);
 
-          fetch('https://localhost:7147/api/Auth/Login', {
+          fetch(config.apiBaseUrl + 'api/Auth/Login', {
             method: 'POST',
             headers: {
               'Accept': 'text',
