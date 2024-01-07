@@ -1,5 +1,4 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.DevTools.V85.Debugger;
 
 namespace TodoLists.Tests.Integration.PageObject.Elements;
 
@@ -13,6 +12,7 @@ public class DataGridElement : BaseElement
     {
         AddRowButton = new ButtonElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-datagrid-addrow-button")));
         TextEditor = new TextBoxElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-texteditor-input")));
+        CloneButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".se-clone-button")));
     }
 
     public List<DataGridRowElement> Rows
@@ -31,4 +31,6 @@ public class DataGridElement : BaseElement
             return result;
         }
     }
+    
+    public ButtonElement CloneButton { get; }
 }

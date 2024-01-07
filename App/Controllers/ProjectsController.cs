@@ -19,11 +19,13 @@ public class ProjectsController : ControllerBase
 {
     private readonly TodoListsDbContext myListsDbContext;
     private readonly IUserService myUserService;
+    private readonly long myProfileId;
 
     public ProjectsController(TodoListsDbContext listsDbContext, IUserService userService)
     {
         myListsDbContext = listsDbContext;
         myUserService = userService;
+        myProfileId = myUserService.GetCurrentUserProfileId();
     }
 
     [HttpGet]
@@ -65,7 +67,45 @@ public class ProjectsController : ControllerBase
         myListsDbContext.Projects.Add(project);
         await myListsDbContext.SaveChangesAsync();
 
-        return Ok();
+        return Ok(project.Id);
+    }
+
+    [HttpPost("Clone")]
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> CloneProject(CloneProjectDto clonedProjectDto)
+    {
+        return await WithExceptionHandling(async () =>
+        {
+
+            var clonedProject =
+                myListsDbContext.Projects.Single(x => x.Id == clonedProjectDto.Id && x.ProfileId == myProfileId);
+
+            var project = new Project
+            {
+                ProfileId = myProfileId,
+                Name = clonedProject.Name,
+                IsDeleted = clonedProject.IsDeleted,
+            };
+            myListsDbContext.Projects.Add(project);
+
+            var clonedTodoItems = myListsDbContext.TodoItems
+                .Where(x => x.ProfileId == myProfileId && x.ProjectId == clonedProjectDto.Id)
+                .ToList();
+
+            foreach (var clonedTodoItem in clonedTodoItems)
+            {
+                myListsDbContext.TodoItems.Add(new TodoItem
+                {
+                    ProfileId = myProfileId,
+                    Name = clonedTodoItem.Name,
+                    IsComplete = clonedTodoItem.IsComplete,
+                    Project = project,
+                });
+            }
+
+            await myListsDbContext.SaveChangesAsync();
+
+            return await GetProjects(null);
+        });
     }
 
     [HttpPatch]

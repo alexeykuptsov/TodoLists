@@ -28,4 +28,9 @@ public class DataGridRowElement : BaseElement
     }
 
     public ButtonElement DeleteButton { get; }
+
+    public void Click()
+    {
+        FindElementByChain().Click();
+    }
 }
