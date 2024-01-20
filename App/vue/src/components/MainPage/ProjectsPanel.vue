@@ -64,7 +64,7 @@ export default {
       let index = e.component.getRowIndexByKey(e.key);
       let rowEl = e.component.getRowElement(index);
 
-      let res = confirm("Do you really want to delete a record with key:" + e.key, "Warning");
+      let res = confirm("Do you really want to delete a record with key: " + e.key.name, "Warning");
 
       e.cancel = new Promise((resolve, reject) => {
         res.then((dialogResult) => {
