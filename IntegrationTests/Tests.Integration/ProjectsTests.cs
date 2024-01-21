@@ -56,6 +56,27 @@ public class ProjectsTests
       },
     });
   }
+
+  [Test]
+  public async Task Delete03()
+  {
+    await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+    {
+      SetUpAsync = async tsc =>
+      {
+        var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+        tsc.CompositeDisposable.Add(httpClient);
+        await TestDataBuilder.CreateProjectAsync("Foo", httpClient);
+      },
+      Test = tc =>
+      {
+        tc.Page.ProjectsDataGrid.Rows[1].DeleteButton.Click();
+        tc.Browser.Wait.Until(_ => tc.Page.DeleteDialog.Displayed && tc.Page.DeleteDialog.YesButton.Displayed);
+
+        Assert.That(tc.Page.DeleteDialog.Message.Text, Is.EqualTo("Do you really want to delete project \"Foo\"?"));
+      },
+    });
+  }
   
   [Test]
   public async Task Add01()

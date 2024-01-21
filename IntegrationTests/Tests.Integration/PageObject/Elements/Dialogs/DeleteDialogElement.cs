@@ -6,6 +6,8 @@ public class DeleteDialogElement: BaseElement
 {
     public ButtonElement YesButton { get; }
 
+    public LabelElement Message { get; }
+
     public override bool Displayed
     {
         get
@@ -22,5 +24,6 @@ public class DeleteDialogElement: BaseElement
         : base(browser, webElementLocatorsChain)
     {
         YesButton = new ButtonElement(Browser, WebElementLocatorsChain.Append(By.CssSelector("[aria-label=\"Yes\"].dx-button")));
+        Message = new LabelElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-dialog-message")));
     }
 }
