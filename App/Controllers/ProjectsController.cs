@@ -138,7 +138,7 @@ public class ProjectsController : ControllerBase
                 rows.Add(new JObject { { "id", id } });
             }
 
-            return Ok(JsonConvert.SerializeObject(new JObject { { "rows", rows } }));
+            return Ok();
         });
     }
 

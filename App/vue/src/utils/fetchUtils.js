@@ -28,7 +28,6 @@ export function patch(urlPath, jsonObject) {
     body: JSON.stringify(jsonObject),
   })
     .then(assertSuccess)
-    .then(response => response.json())
     .catch(error => notifyUtils.notifySystemError(`Failed to execute PATCH ${urlPath}.`, error));
 }
 
