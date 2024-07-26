@@ -6,7 +6,7 @@ using TodoLists.Tests.Integration.Utils.NUnit;
 
 namespace TodoLists.Tests.Integration.PageObject;
 
-public class Browser : IDisposable
+public sealed class Browser : IDisposable
 {
     public ChromeDriver Driver { get; }
     public WebDriverWait Wait { get; }
@@ -24,6 +24,8 @@ public class Browser : IDisposable
 
     public void Dispose()
     {
+        Driver.Close();
+        Driver.Quit();
         Driver.Dispose();
     }
 

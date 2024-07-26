@@ -55,14 +55,11 @@ For example: *C:\Tools\postgresql-15.1-1-windows-x64-binaries\pgsql*
 
 ### Running in a Development Environment
 
-Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
+In Rider:
 
-To apply vue project changes on-the-fly run in Terminal (`Alt+F12` in Rider):
+1. Run configuration "buildDevWatch".
 
-```shell
-cd App/vue
-npm run buildDevWatch
-```
+2. Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
 
 ### Tests
 

@@ -11,6 +11,8 @@ public class BaseElement
 
     public virtual bool Displayed => FindElementByChain().Displayed;
 
+    public virtual bool Enabled => FindElementByChain().Enabled;
+
     public BaseElement(Browser browser, IEnumerable<By> webElementLocatorsChain)
     {
         Browser = browser;
