@@ -46,7 +46,7 @@ public class ProjectsTests
                 tsc.CompositeDisposable.Add(httpClient);
                 await TestDataBuilder.CreateProjectAsync("Foo", httpClient);
             },
-            Test = tc =>
+            TestAsync = async tc =>
             {
                 tc.Page.ProjectsDataGrid.Rows[1].DeleteButton.Click();
                 tc.Browser.Wait.Until(_ => tc.Page.DeleteDialog is
@@ -55,6 +55,7 @@ public class ProjectsTests
                     YesButton.Displayed: true,
                     YesButton.Enabled: true
                 });
+                await Task.Delay(200);
                 tc.Page.DeleteDialog.YesButton.Click();
                 tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 1);
                 tc.Page.Refresh();

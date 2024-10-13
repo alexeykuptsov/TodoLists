@@ -63,7 +63,7 @@ export default {
 
       let res = confirm("Do you really want to delete project \"" + e.key.name + "\"?", "Warning");
 
-      e.cancel = new Promise((resolve, reject) => {
+      e.cancel = new Promise((resolve) => {
         res.then((dialogResult) => {
           resolve(!dialogResult)
         });
