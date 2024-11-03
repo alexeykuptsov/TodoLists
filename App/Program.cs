@@ -6,13 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog.Sinks.SystemConsole.Themes;
 using Swashbuckle.AspNetCore.Filters;
 using TodoLists.App.Entities;
+using TodoLists.App.Middleware;
 using TodoLists.App.Services;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("TodoLists.App.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 8)
     .WriteTo.Console()
+    .WriteTo.File(
+        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? "../TodoLists.App.log" : "TodoLists.App.log",
+        rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 Log.Information("Start");
@@ -21,14 +25,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog((context, configuration) =>
-    {
-        configuration
-            .WriteTo.Console()
-            .WriteTo.File(
-                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? "../TodoLists.App.log" : "TodoLists.App.log",
-                rollingInterval: RollingInterval.Day);
-    });
+    builder.Host.UseSerilog();
 
     builder.Services.AddControllers();
     builder.Services.AddDbContext<TodoListsDbContext>(options =>
@@ -79,6 +76,8 @@ try
         wwwrootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "wwwroot"));
     }
 
+    app.UseMiddleware<ExceptionMiddleware>();
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 

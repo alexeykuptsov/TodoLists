@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "core-js": "^3.38.1",
-    "devextreme": "^23.2.9",
-    "devextreme-vue": "^23.2.9",
+    "devextreme": "~22.1.14",
+    "devextreme-vue": "~22.1.14",
     "jquery": "^3.7.1",
     "splitpanes": "^3.1.5",
     "vue": "^3.5.12"
