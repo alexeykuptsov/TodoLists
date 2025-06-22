@@ -26,6 +26,7 @@
             :class="{ 'se-todo-items-data-grid': true }"
             :ref="todoItemsDataGridRefKey"
             :data-source="todoItems"
+            :key-expr="'id'"
             :remote-operations="false"
             :allow-column-reordering="true"
             :row-alternation-enabled="true"

@@ -44,7 +44,7 @@ namespace TodoLists.Tests.Integration
             {
                 SetUpAsync = async tsc =>
                 {
-                    var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+                    using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
                     tsc.CompositeDisposable.Add(httpClient);
                     var projectId = await GetInboxProjectId(httpClient);
                     await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);
@@ -68,7 +68,7 @@ namespace TodoLists.Tests.Integration
             {
                 SetUpAsync = async tsc =>
                 {
-                    var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
+                    using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName, TestDataBuilder.DefaultUserName);
                     tsc.CompositeDisposable.Add(httpClient);
                     var projectId = await GetInboxProjectId(httpClient);
                     await TestDataBuilder.CreateTodoItemAsync(projectId, "foo", false, httpClient);

@@ -40,7 +40,7 @@ public class ProjectsTests
         {
             SetUpAsync = async tsc =>
             {
-                var httpClient =
+                using var httpClient =
                     await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName,
                         TestDataBuilder.DefaultUserName);
                 tsc.CompositeDisposable.Add(httpClient);
@@ -53,7 +53,7 @@ public class ProjectsTests
                 {
                     Displayed: true,
                     YesButton.Displayed: true,
-                    YesButton.Enabled: true
+                    YesButton.Enabled: true,
                 });
                 await Task.Delay(200);
                 tc.Page.DeleteDialog.YesButton.Click();
@@ -73,7 +73,7 @@ public class ProjectsTests
         {
             SetUpAsync = async tsc =>
             {
-                var httpClient =
+                using var httpClient =
                     await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName,
                         TestDataBuilder.DefaultUserName);
                 tsc.CompositeDisposable.Add(httpClient);
@@ -138,7 +138,7 @@ public class ProjectsTests
         {
             SetUpAsync = async tsc =>
             {
-                var httpClient =
+                using var httpClient =
                     await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(tsc.ProfileName,
                         TestDataBuilder.DefaultUserName);
                 tsc.CompositeDisposable.Add(httpClient);

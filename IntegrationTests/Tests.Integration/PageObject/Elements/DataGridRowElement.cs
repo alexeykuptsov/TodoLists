@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 
 namespace TodoLists.Tests.Integration.PageObject.Elements;
 
@@ -32,5 +33,54 @@ public class DataGridRowElement : BaseElement
     public void Click()
     {
         FindElementByChain().Click();
+    }
+    
+    
+    public IWebElement DragHandle
+    {
+        get
+        {
+            return FindElementByChain(WebElementLocatorsChain.Append(By.CssSelector(".dx-datagrid-drag-icon")).ToList());
+        }
+    }
+
+    public void DragBeforeRow(DataGridRowElement targetRow)
+    {
+        var sourceElement = DragHandle;
+        var targetElement = targetRow.FindElementByChain();
+        
+        // Calculate position at 1/5 from the top of the target row
+        var targetSize = targetElement.Size;
+        var targetLocation = targetElement.Location;
+        var offsetY = (int)(targetSize.Height * 0.2); // 1/5 from top
+        
+        var actions = new Actions(Browser.Driver);
+        actions.ClickAndHold(sourceElement)
+            .MoveToElement(targetElement, 0, offsetY - (targetSize.Height / 2)) // Offset from center
+            .Release()
+            .Perform();
+        
+        // Wait for the drag operation to complete
+        Thread.Sleep(500);
+    }
+
+    public void DragAfterRow(DataGridRowElement targetRow)
+    {
+        var sourceElement = DragHandle;
+        var targetElement = targetRow.FindElementByChain();
+        
+        // Calculate position at 1/5 from the bottom of the target row
+        var targetSize = targetElement.Size;
+        var targetLocation = targetElement.Location;
+        var offsetY = (int)(targetSize.Height * 0.8); // 4/5 from top (1/5 from bottom)
+        
+        var actions = new Actions(Browser.Driver);
+        actions.ClickAndHold(sourceElement)
+            .MoveToElement(targetElement, 0, offsetY - (targetSize.Height / 2)) // Offset from center
+            .Release()
+            .Perform();
+        
+        // Wait for the drag operation to complete
+        Thread.Sleep(500);
     }
 }

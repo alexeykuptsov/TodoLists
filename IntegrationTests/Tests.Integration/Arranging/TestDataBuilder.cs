@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace TodoLists.Tests.Integration.Arranging;
 
@@ -33,6 +34,19 @@ public class TestDataBuilder
         var response = await httpClient.PostAsync("api/Projects", content);
         response.EnsureSuccessStatusCode();
         return long.Parse(await response.Content.ReadAsStringAsync());
+    }
+
+    public static async Task RenameProjectAsync(string sourceName, string targetName, HttpClient httpClient)
+    {
+        var getResponse = await httpClient.GetAsync("api/Projects");
+        getResponse.EnsureSuccessStatusCode();
+        var getResponseDict = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(await getResponse.Content.ReadAsStringAsync());
+        var id = (long)getResponseDict!.Single(x => (string)x["name"] == sourceName)["id"];
+
+        var content = new StringContent($"[{{\"data\":{{\"id\":{id},\"name\":\"{targetName}\"}},\"key\":{id},\"type\":\"update\"}}]");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        var response = await httpClient.PatchAsync("api/Projects", content);
+        response.EnsureSuccessStatusCode();
     }
 
     public static async Task CreateTodoItemAsync(long projectId, string todoItemName, bool isComplete, HttpClient httpClient)

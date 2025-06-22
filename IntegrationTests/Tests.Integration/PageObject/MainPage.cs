@@ -10,8 +10,8 @@ public class MainPage : BasePage
     public ButtonElement AddTodoItemButton { get; }
     public DataGridElement ProjectsDataGrid { get; }
     public DataGridElement TodoItemsDataGrid { get; }
-    public LabelElement ProjectNameLabel { get; } 
-    public DeleteDialogElement DeleteDialog { get; } 
+    public LabelElement ProjectNameLabel { get; }
+    public DeleteDialogElement DeleteDialog { get; }
 
     public MainPage(Browser browser) : base(browser)
     {

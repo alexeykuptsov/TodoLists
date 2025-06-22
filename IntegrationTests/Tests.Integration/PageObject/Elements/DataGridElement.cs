@@ -33,4 +33,33 @@ public class DataGridElement : BaseElement
     }
     
     public ButtonElement CloneButton { get; }
+    
+    public void DragRowBeforePosition(int sourceRowIndex, int targetRowIndex)
+    {
+        var draggableRows = Rows;
+        if (sourceRowIndex >= draggableRows.Count || targetRowIndex >= draggableRows.Count)
+        {
+            throw new ArgumentException("Row index out of bounds");
+        }
+
+        var sourceRow = draggableRows[sourceRowIndex];
+        var targetRow = draggableRows[targetRowIndex];
+
+        sourceRow.DragBeforeRow(targetRow);
+    }
+
+    public void DragRowAfterPosition(int sourceRowIndex, int targetRowIndex)
+    {
+        var draggableRows = Rows;
+        if (sourceRowIndex >= draggableRows.Count || targetRowIndex >= draggableRows.Count)
+        {
+            throw new ArgumentException("Row index out of bounds");
+        }
+
+        var sourceRow = draggableRows[sourceRowIndex];
+        var targetRow = draggableRows[targetRowIndex];
+
+        sourceRow.DragAfterRow(targetRow);
+    }
+
 }

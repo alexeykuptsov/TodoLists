@@ -13,7 +13,7 @@ using TodoLists.App.Middleware;
 using TodoLists.App.Services;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
+    .WriteTo.Console(theme: AnsiConsoleTheme.Grayscale)
     .WriteTo.File(
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? "../TodoLists.App.log" : "TodoLists.App.log",
         rollingInterval: RollingInterval.Day)

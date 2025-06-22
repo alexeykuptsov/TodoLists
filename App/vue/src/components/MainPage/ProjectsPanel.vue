@@ -61,7 +61,7 @@ export default {
         return;
       }
 
-      let res = confirm("Do you really want to delete project \"" + e.key.name + "\"?", "Warning");
+      let res = confirm("Do you really want to delete project \"" + e.data.name + "\"?", "Warning");
 
       e.cancel = new Promise((resolve) => {
         res.then((dialogResult) => {
@@ -103,6 +103,7 @@ export default {
     :class="{ 'se-projects-data-grid': true }"
     :ref="projectsDataGridRefKey"
     :data-source="projects"
+    :key-expr="'id'"
     :remote-operations="false"
     :allow-column-reordering="true"
     :row-alternation-enabled="true"

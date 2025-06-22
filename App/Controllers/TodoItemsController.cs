@@ -125,7 +125,7 @@ public class TodoItemsController : ControllerBase
     {
         foreach (dynamic change in body.EnumerateArray())
         {
-            long id = change.GetProperty("key").GetProperty("id").GetInt64();
+            long id = change.GetProperty("key").GetInt64();
             foreach (dynamic property in change.GetProperty("data").EnumerateObject())
             {
                 string propertyName = property.Name;

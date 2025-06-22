@@ -124,11 +124,11 @@ public class ProjectsController : ControllerBase
                         id = await InsertProject(change.GetProperty("data"));
                         break;
                     case "update":
-                        id = change.GetProperty("key").GetProperty("id").GetInt64();
+                        id = change.GetProperty("data").GetProperty("id").GetInt64();
                         await UpdateProject(change.GetProperty("data"), id.Value);
                         break;
                     case "remove":
-                        id = change.GetProperty("key").GetProperty("id").GetInt64();
+                        id = change.GetProperty("key").GetInt64();
                         await DeleteProject(id.Value);
                         break;
                     default:

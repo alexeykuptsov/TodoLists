@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework.Constraints;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using TodoLists.Tests.Integration.Utils;
 using TodoLists.Tests.Integration.Utils.NUnit;
@@ -62,5 +63,35 @@ public sealed class Browser : IDisposable
         {
             throw e.InnerException ?? e;
         }
+    }
+
+    public void DragAndDrop(IWebElement sourceElement, IWebElement targetElement)
+    {
+        var actions = new Actions(Driver);
+        actions.DragAndDrop(sourceElement, targetElement).Perform();
+        
+        // Wait a bit for the drag operation to complete
+        Thread.Sleep(500);
+    }
+
+    public void DragAndDropByOffset(IWebElement sourceElement, int xOffset, int yOffset)
+    {
+        var actions = new Actions(Driver);
+        actions.DragAndDropToOffset(sourceElement, xOffset, yOffset).Perform();
+        
+        // Wait a bit for the drag operation to complete
+        Thread.Sleep(500);
+    }
+
+    public void DragAndDropWithActions(IWebElement sourceElement, IWebElement targetElement)
+    {
+        var actions = new Actions(Driver);
+        actions.ClickAndHold(sourceElement)
+               .MoveToElement(targetElement)
+               .Release()
+               .Perform();
+        
+        // Wait a bit for the drag operation to complete
+        Thread.Sleep(500);
     }
 }
