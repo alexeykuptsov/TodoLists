@@ -10,11 +10,6 @@ The purpose of the project is practicing with programming languages, technologie
 
 _(to be implemented)_
 
-Download and unpack ZIP-archive.
-
-To use the app run the launcher app `TodoLists.Launcher/bin/Debug/net7.0-windows/TodoLists.Launcher.exe` and open
-https://localhost:7147 in a browser.
-
 ## Issue Tracking
 
 Issues: [https://github.com/alexeykuptsov/TodoLists/issues](https://github.com/alexeykuptsov/TodoLists/issues)
