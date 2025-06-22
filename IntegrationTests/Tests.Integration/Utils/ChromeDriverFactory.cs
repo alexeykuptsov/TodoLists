@@ -13,13 +13,10 @@ public static class ChromeDriverFactory
         var options = new ChromeOptions();
         
         // Suppress password security warnings and notifications
-        options.AddArgument("--disable-password-generation");
-        options.AddArgument("--disable-password-manager-reauthentication");
-        options.AddArgument("--disable-save-password-bubble");
-        options.AddArgument("--disable-features=VizDisplayCompositor,PasswordManager");
         options.AddArgument("--no-first-run");
-        options.AddArgument("--disable-infobars");
-        options.AddArgument("--disable-notifications");
+        options.AddUserProfilePreference("credentials_enable_service", false);
+        options.AddUserProfilePreference("profile.password_manager_enabled", false);
+        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
         
         return new ChromeDriver(options);
     }
