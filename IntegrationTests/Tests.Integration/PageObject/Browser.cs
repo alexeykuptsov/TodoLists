@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using TodoLists.Tests.Integration.Utils;
 using TodoLists.Tests.Integration.Utils.NUnit;
 
 namespace TodoLists.Tests.Integration.PageObject;
@@ -13,7 +14,7 @@ public sealed class Browser : IDisposable
 
     public Browser()
     {
-        Driver = new ChromeDriver();
+        Driver = ChromeDriverFactory.CreateChromeDriver();
         Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3))
         {
             PollingInterval = TimeSpan.FromMilliseconds(200),

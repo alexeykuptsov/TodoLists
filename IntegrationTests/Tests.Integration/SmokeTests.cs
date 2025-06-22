@@ -1,6 +1,6 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using TodoLists.Tests.Integration.Utils;
 
 namespace TodoLists.Tests.Integration;
 
@@ -14,7 +14,7 @@ public class SmokeTests
     [Test]
     public void Test1()
     {
-        using var chromeDriver = new ChromeDriver();
+        using var chromeDriver = ChromeDriverFactory.CreateChromeDriver();
         var wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(3))
         {
             PollingInterval = TimeSpan.FromMilliseconds(200),
