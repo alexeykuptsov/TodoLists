@@ -181,6 +181,7 @@ erDiagram
         bigint ProfileId FK
         string Name
         boolean IsDeleted
+        integer Order
     }
     
     TodoItem {
@@ -215,6 +216,7 @@ erDiagram
 - Task organization containers
 - Soft delete functionality
 - Profile-scoped isolation
+- Custom ordering support for drag-and-drop reordering
 
 **TodoItem Entity** ([`TodoItem.cs`](App/Entities/TodoItem.cs))
 - Individual task records
@@ -285,6 +287,17 @@ erDiagram
 ```json
 {
   "id": "number"
+}
+```
+**Response**: Updated projects list
+**Security**: Requires authentication
+
+#### POST /api/Projects/Reorder
+**Purpose**: Reorder projects via drag-and-drop
+**Request Body**:
+```json
+{
+  "projectIds": ["number array in new order"]
 }
 ```
 **Response**: Updated projects list
@@ -391,9 +404,10 @@ App.vue (Root)
 
 **ProjectsPanel Component** ([`ProjectsPanel.vue`](App/vue/src/components/MainPage/ProjectsPanel.vue))
 - DevExtreme DataGrid for project management
-- Drag-and-drop reordering
+- Drag-and-drop reordering with immediate UI feedback
 - Inline editing and deletion
 - Project cloning functionality
+- Custom order persistence and synchronization
 
 ### 5.2 State Management
 
@@ -435,6 +449,21 @@ App.vue (Root)
 - **Static Assets**: Public directory serving
 - **Component Styles**: Scoped CSS support
 - **External Libraries**: DevExtreme and jQuery integration
+
+### 5.5 Drag-and-Drop Functionality
+
+#### 5.5.1 Project Reordering
+- **DevExtreme RowDragging**: Built-in drag-and-drop support
+- **Real-time Updates**: Immediate UI feedback during reordering
+- **Backend Synchronization**: Automatic order persistence to database
+- **Error Handling**: Graceful fallback with data refresh on failures
+
+#### 5.5.2 Implementation Details
+- **Event Handling**: `@reorder` event captures drag-and-drop operations
+- **Order Calculation**: Client-side array manipulation for new sequence
+- **API Integration**: RESTful endpoint for order updates
+- **State Management**: Local array updates for immediate UI response
+- **Data Consistency**: Server-side validation and persistence
 
 ---
 
@@ -805,9 +834,3 @@ This technical specification provides a comprehensive overview of the TodoLists 
 The multi-tenant architecture ensures secure data isolation while providing a scalable foundation for future enhancements. The modern technology stack leverages industry best practices for web application development, security, and deployment.
 
 Regular updates to this specification should reflect system evolution, new requirements, and architectural improvements as the application continues to mature.
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: December 2024  
-**Next Review**: March 2025
