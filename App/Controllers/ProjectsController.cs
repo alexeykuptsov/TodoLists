@@ -3,8 +3,6 @@ using EasyExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using TodoLists.App.Entities;
 using TodoLists.App.Models;
@@ -158,7 +156,6 @@ public class ProjectsController : ControllerBase
     {
         return await WithExceptionHandling(async () =>
         {
-            var rows = new JArray();
             foreach (var change in body.EnumerateArray())
             {
                 var changeType = change.GetProperty("type").GetString();
@@ -166,7 +163,7 @@ public class ProjectsController : ControllerBase
                 switch (changeType)
                 {
                     case "insert":
-                        id = await InsertProject(change.GetProperty("data"));
+                        await InsertProject(change.GetProperty("data"));
                         break;
                     case "update":
                         id = change.GetProperty("data").GetProperty("id").GetInt64();
@@ -179,8 +176,6 @@ public class ProjectsController : ControllerBase
                     default:
                         throw new InvalidOperationException();
                 }
-
-                rows.Add(new JObject { { "id", id } });
             }
 
             return Ok();

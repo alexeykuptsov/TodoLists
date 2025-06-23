@@ -37,4 +37,16 @@
     <ItemGroup>
       <ProjectReference Include="..\Utils\Utils.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Analyzer Include="..\Analyzers\binRelease\net7.0\TodoList.Analyzers.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="**\*.vue" />
+      <AdditionalFiles Include="**\*.md" />
+      <AdditionalFiles Include="**\*.js" />
+      <AdditionalFiles Include="**\*.ts" />
+    </ItemGroup>
+
 </Project>

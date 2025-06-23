@@ -1,6 +1,5 @@
 ﻿using EasyExceptions;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace TodoLists.App.Middleware;
