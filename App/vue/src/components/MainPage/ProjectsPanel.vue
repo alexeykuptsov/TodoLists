@@ -95,9 +95,13 @@ export default {
       });
     },
     onReorder(e) {
-      // The DevExtreme reorder event automatically updates the local data source
-      // We just need to get the new order and send it to the backend
-      const reorderedProjectIds = this.projects.map(project => project.id);
+      const reorderedProjects = [...this.projects];
+
+      reorderedProjects.splice(e.fromIndex, 1);
+      reorderedProjects.splice(e.toIndex, 0, e.itemData);
+
+      // Get the project IDs in the new order
+      const reorderedProjectIds = reorderedProjects.map(project => project.id);
       
       // Call the backend API to update the order
       fetchUtils.post('api/Projects/Reorder', { projectIds: reorderedProjectIds })
