@@ -105,6 +105,9 @@ export default {
       
       // Call the backend API to update the order
       fetchUtils.post('api/Projects/Reorder', { projectIds: reorderedProjectIds })
+        .then(() => {
+          this.refreshData()
+        })
         .catch(error => {
           notifyUtils.notifySystemError('Unable to reorder projects.', error);
           // Refresh data to revert the UI changes on error
