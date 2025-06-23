@@ -1,5 +1,5 @@
 <script>
-import {DxColumn, DxDataGrid, DxEditing, DxRowDragging, DxToolbar, DxItem} from "devextreme-vue/data-grid";
+import {DxColumn, DxDataGrid, DxEditing, DxRowDragging, DxToolbar, DxItem, DxSorting} from "devextreme-vue/data-grid";
 import {DxButton} from "devextreme-vue/button";
 import * as fetchUtils from '@/utils/fetchUtils.js';
 import * as notifyUtils from "@/utils/notifyUtils";
@@ -18,6 +18,7 @@ export default {
     DxToolbar,
     DxItem,
     DxButton,
+    DxSorting,
   },
   data() {
     return {
@@ -75,6 +76,7 @@ export default {
         this.projects.push({
           id: item.id,
           name: item.name,
+          order: item.order,
         });
       });
       // this.projectsDataSource.store().load();
@@ -91,6 +93,19 @@ export default {
       fetchUtils.post('api/Projects/clone', { id: this.focusedRow.id }).then(() => {
         this.refreshData();
       });
+    },
+    onReorder(e) {
+      // The DevExtreme reorder event automatically updates the local data source
+      // We just need to get the new order and send it to the backend
+      const reorderedProjectIds = this.projects.map(project => project.id);
+      
+      // Call the backend API to update the order
+      fetchUtils.post('api/Projects/Reorder', { projectIds: reorderedProjectIds })
+        .catch(error => {
+          notifyUtils.notifySystemError('Unable to reorder projects.', error);
+          // Refresh data to revert the UI changes on error
+          this.refreshData();
+        });
     },
   }
 }
@@ -117,6 +132,7 @@ export default {
     @saved="projectsDataGrid_onSaved"
     @row-removing="projectsDataGrid_onRowRemoving"
   >
+    <DxSorting mode="single" />
     <DxEditing
       :allow-updating="true"
       :allow-deleting="true"
@@ -126,8 +142,15 @@ export default {
     />
     <DxRowDragging
       :allow-reordering="true"
+      @reorder="onReorder"
     />
     <DxColumn data-field="name"/>
+    <DxColumn
+      data-field="order"
+      :visible="false"
+      :sort-order="'asc'"
+      :sort-index="0"
+    />
     <DxToolbar>
       <DxItem
         location="after"

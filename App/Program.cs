@@ -98,7 +98,7 @@ try
 }
 catch (HostAbortedException)
 {
-    Log.Information("Ignored HostAbortedException");
+    // Ignored HostAbortedException - ;
 }
 catch (Exception ex)
 {

@@ -34,6 +34,7 @@ public class ProjectsController : ControllerBase
         var allProjects = await myListsDbContext.Projects
             .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId())
             .Where(x => !x.IsDeleted)
+            .OrderBy(x => x.Order)
             .Select(x => EntityToDto(x))
             .ToListAsync();
         if (projectName != null)
@@ -57,11 +58,17 @@ public class ProjectsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostProject(ProjectDto projectDto)
     {
+        // Get the next order value for this profile
+        var maxOrder = await myListsDbContext.Projects
+            .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId() && !x.IsDeleted)
+            .MaxAsync(x => (int?)x.Order) ?? 0;
+
         var project = new Project
         {
             Profile = await myListsDbContext.Profiles.SingleAsync(x => x.Id == myUserService.GetCurrentUserProfileId()),
             Name = projectDto.Name,
             IsDeleted = projectDto.IsDeleted,
+            Order = maxOrder + 1
         };
 
         myListsDbContext.Projects.Add(project);
@@ -79,11 +86,17 @@ public class ProjectsController : ControllerBase
             var clonedProject =
                 myListsDbContext.Projects.Single(x => x.Id == clonedProjectDto.Id && x.ProfileId == myProfileId);
 
+            // Get the next order value for this profile
+            var maxOrder = await myListsDbContext.Projects
+                .Where(x => x.ProfileId == myProfileId && !x.IsDeleted)
+                .MaxAsync(x => (int?)x.Order) ?? 0;
+
             var project = new Project
             {
                 ProfileId = myProfileId,
                 Name = clonedProject.Name,
                 IsDeleted = clonedProject.IsDeleted,
+                Order = maxOrder + 1
             };
             myListsDbContext.Projects.Add(project);
 
@@ -104,6 +117,38 @@ public class ProjectsController : ControllerBase
 
             await myListsDbContext.SaveChangesAsync();
 
+            return await GetProjects(null);
+        });
+    }
+
+    [HttpPost("Reorder")]
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> ReorderProjects([FromBody] ReorderProjectsDto reorderDto)
+    {
+        return await WithExceptionHandling(async () =>
+        {
+            var projectIds = reorderDto.ProjectIds;
+            
+            // Validate that all projects belong to the current user
+            var userProjects = await myListsDbContext.Projects
+                .Where(x => x.ProfileId == myProfileId && !x.IsDeleted)
+                .Where(x => projectIds.Contains(x.Id))
+                .ToListAsync();
+
+            if (userProjects.Count != projectIds.Length)
+            {
+                return BadRequest("Invalid project IDs provided");
+            }
+
+            // Update the order for each project
+            for (int i = 0; i < projectIds.Length; i++)
+            {
+                var projectId = projectIds[i];
+                await myListsDbContext.Projects
+                    .Where(x => x.Id == projectId && x.ProfileId == myProfileId)
+                    .ExecuteUpdateAsync(x => x.SetProperty(t => t.Order, i + 1));
+            }
+
+            // Return updated projects list
             return await GetProjects(null);
         });
     }
@@ -166,10 +211,16 @@ public class ProjectsController : ControllerBase
 
     private async Task<long> InsertProject(JsonElement data)
     {
+        // Get the next order value for this profile
+        var maxOrder = await myListsDbContext.Projects
+            .Where(x => x.ProfileId == myUserService.GetCurrentUserProfileId() && !x.IsDeleted)
+            .MaxAsync(x => (int?)x.Order) ?? 0;
+
         var entity = new Project
         {
             ProfileId = myUserService.GetCurrentUserProfileId(),
             Name = data.GetProperty("name").GetString(),
+            Order = maxOrder + 1
         };
         await myListsDbContext.Projects.AddAsync(entity);
         await myListsDbContext.SaveChangesAsync();
@@ -198,6 +249,7 @@ public class ProjectsController : ControllerBase
     {
         Id = entity.Id,
         Name = entity.Name,
-        IsDeleted = entity.IsDeleted
+        IsDeleted = entity.IsDeleted,
+        Order = entity.Order
     };
 }
