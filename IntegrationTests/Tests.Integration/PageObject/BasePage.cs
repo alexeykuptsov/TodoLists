@@ -25,6 +25,15 @@ public class BasePage
             {
                 return false;
             }
+            catch (WebDriverException e)
+            {
+                if (e.Message.Contains("Node with given id does not belong to the document"))
+                {
+                    return false;
+                }
+
+                throw;
+            }
             return documentReadyState == "complete" && ajaxReadyState == "complete";
         });
     }
