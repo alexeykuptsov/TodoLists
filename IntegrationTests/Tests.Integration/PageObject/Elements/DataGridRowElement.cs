@@ -9,6 +9,7 @@ public class DataGridRowElement : BaseElement
         : base(browser, webElementLocatorsChain)
     {
         DeleteButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-link-delete")));
+        EditButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-link-edit")));
     }
 
     public List<DataGridCellElement> Cells
@@ -29,6 +30,7 @@ public class DataGridRowElement : BaseElement
     }
 
     public ButtonElement DeleteButton { get; }
+    public ButtonElement EditButton { get; }
 
     public void Click()
     {

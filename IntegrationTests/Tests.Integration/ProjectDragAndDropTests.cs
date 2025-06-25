@@ -34,6 +34,8 @@ public class ProjectDragAndDropTests
                     return newOrder.Count == 3 && newOrder[0] == "Project C";
                 });
                 
+                context.Page.Refresh();
+                
                 // Verify new order
                 var finalOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
                 Assert.That(finalOrder, Is.EqualTo(new[] { "Project C", "Project A", "Project B" }));
@@ -70,6 +72,8 @@ public class ProjectDragAndDropTests
                     var newOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
                     return newOrder.Count == 3 && newOrder[2] == "First Project";
                 });
+                
+                context.Page.Refresh();
                 
                 // Verify new order
                 var finalOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
@@ -108,6 +112,8 @@ public class ProjectDragAndDropTests
                     var newOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
                     return newOrder.Count == 4 && newOrder[2] == "Delta";
                 });
+                
+                context.Page.Refresh();
                 
                 // Verify new order
                 var finalOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
@@ -162,6 +168,8 @@ public class ProjectDragAndDropTests
                     return newOrder.Count == 5 && newOrder[4] == "Project 2";
                 });
                 
+                context.Page.Refresh();
+                
                 // Verify final order
                 var finalOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
                 Assert.That(finalOrder, Is.EqualTo(new[] { "Project 5", "Project 1", "Project 3", "Project 4", "Project 2" }));
@@ -198,6 +206,8 @@ public class ProjectDragAndDropTests
                     var newOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
                     return newOrder.Count == 3 && newOrder[0] == "Item C";
                 });
+                
+                context.Page.Refresh();
                 
                 // Verify new order
                 var finalOrder = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();

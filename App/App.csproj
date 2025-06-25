@@ -48,5 +48,4 @@
       <AdditionalFiles Include="**\*.js" />
       <AdditionalFiles Include="**\*.ts" />
     </ItemGroup>
-
 </Project>
