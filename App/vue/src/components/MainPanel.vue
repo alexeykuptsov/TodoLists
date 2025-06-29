@@ -26,13 +26,13 @@
             :class="{ 'se-todo-items-data-grid': true }"
             :ref="todoItemsDataGridRefKey"
             :data-source="todoItems"
-            :key-expr="'id'"
+            key-expr="id"
             :remote-operations="false"
             :allow-column-reordering="true"
             :row-alternation-enabled="true"
             :show-borders="true"
             :show-column-headers="false"
-            @saving="onSaving"
+            @saved="todoItemsDataGrid_onSaved"
         >
           <DxEditing
               :allow-updating="true"
@@ -53,6 +53,7 @@ import 'splitpanes/dist/splitpanes.css'
 import {DxColumn, DxDataGrid, DxEditing} from 'devextreme-vue/data-grid';
 import * as fetchUtils from '../utils/fetchUtils';
 import ProjectsPanel from "@/components/MainPage/ProjectsPanel.vue";
+import * as notifyUtils from "@/utils/notifyUtils";
 
 const todoItemsDataGridRefKey = 'todo-items-data-grid';
 
@@ -75,6 +76,7 @@ export default {
       todoItemsDataGridRefKey,
       projectId: null,
       projectName: null,
+      todoItemsUri: 'api/TodoItems',
     };
   },
   computed: {
@@ -104,19 +106,23 @@ export default {
         isComplete: false,
       };
 
-      fetchUtils.post('api/TodoItems', item)
+      fetchUtils.post(this.todoItemsUri, item)
         .then(() => {
           this.refreshTodoItems();
           addNameTextBox.value = '';
         });
     },
     refreshTodoItems() {
-      fetchUtils.get(`api/TodoItems?projectId=${this.projectId}`).then(data => {
+      fetchUtils.get(this.todoItemsUri + `?projectId=${this.projectId}`).then(data => {
         this._displayItems(data);
       });
     },
-    onSaving(e) {
-      fetchUtils.patch(`api/TodoItems`, e.changes);
+    todoItemsDataGrid_onSaved(e) {
+      fetchUtils.patch(this.todoItemsUri, e.changes)
+        .then(() => {
+          this.refreshTodoItems()
+        })
+        .catch(error => notifyUtils.notifySystemError('Unable to patch item.', error));
     },
     _displayItems(data) {
       _displayCount(data.length);

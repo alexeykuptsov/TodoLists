@@ -2,7 +2,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using TodoLists.Tests.Integration.Utils;
 
-namespace TodoLists.Tests.Integration;
+namespace TodoLists.Tests.Integration.Tests;
 
 public class SmokeTests
 {

@@ -1,13 +1,13 @@
 using TodoLists.Tests.Integration.PageObject.Elements;
 
-namespace TodoLists.Tests.Integration;
+namespace TodoLists.Tests.Integration.Tests.MainPage;
 
 public class ProjectDragAndDropTests
 {
     [Test]
     public async Task DragAndDrop_MoveProjectUp_ShouldReorderProjectsInUI()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -46,7 +46,7 @@ public class ProjectDragAndDropTests
     [Test]
     public async Task DragAndDrop_MoveProjectDown_ShouldReorderProjectsInUI()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -85,7 +85,7 @@ public class ProjectDragAndDropTests
     [Test]
     public async Task DragAndDrop_MoveProjectToMiddle_ShouldReorderProjectsInUI()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -125,7 +125,7 @@ public class ProjectDragAndDropTests
     [Test]
     public async Task DragAndDrop_MultipleOperations_ShouldMaintainCorrectOrder()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -180,7 +180,7 @@ public class ProjectDragAndDropTests
     [Test]
     public async Task DragAndDrop_WithIndexBasedOperations_ShouldReorderCorrectly()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {

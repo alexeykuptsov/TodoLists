@@ -1,4 +1,4 @@
-﻿namespace TodoLists.Tests.Integration;
+﻿namespace TodoLists.Tests.Integration.Tests.MainPage;
 
 public class ProjectsTests
 {
@@ -36,7 +36,7 @@ public class ProjectsTests
     [Test]
     public async Task Delete02()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async tsc =>
             {
@@ -69,7 +69,7 @@ public class ProjectsTests
     [Test]
     public async Task Delete03()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async tsc =>
             {
@@ -110,7 +110,7 @@ public class ProjectsTests
     [Test]
     public async Task MasterDetail01()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             TestAsync = async tc =>
             {
@@ -134,7 +134,7 @@ public class ProjectsTests
     [Test]
     public async Task Clone01()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async tsc =>
             {

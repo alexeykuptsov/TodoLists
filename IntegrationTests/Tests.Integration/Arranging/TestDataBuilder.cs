@@ -58,6 +58,20 @@ public class TestDataBuilder
         response.EnsureSuccessStatusCode();
     }
 
+    public static async Task RenameTodoItemAsync(long projectId, string sourceName, string targetName, HttpClient httpClient)
+    {
+        var getResponse = await httpClient.GetAsync($"api/TodoItems?projectId={projectId}");
+        getResponse.EnsureSuccessStatusCode();
+        var getResponseDict = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(await getResponse.Content.ReadAsStringAsync());
+        var todoItem = getResponseDict!.Single(x => (string)x["name"] == sourceName);
+        var id = (long)todoItem["id"];
+
+        var content = new StringContent($"[{{\"data\":{{\"id\":{id},\"name\":\"{targetName}\"}},\"key\":{id},\"type\":\"update\"}}]");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        var response = await httpClient.PatchAsync("api/TodoItems", content);
+        response.EnsureSuccessStatusCode();
+    }
+
     private static async Task CreateUserAsync(string profileName, string username, HttpClient hHttpClient)
     {
         var content =

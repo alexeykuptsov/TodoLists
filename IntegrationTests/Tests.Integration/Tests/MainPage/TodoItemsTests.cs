@@ -1,6 +1,6 @@
 using Newtonsoft.Json.Linq;
 
-namespace TodoLists.Tests.Integration
+namespace TodoLists.Tests.Integration.Tests.MainPage
 {
     public class TodoItemsTests
     {
@@ -40,7 +40,7 @@ namespace TodoLists.Tests.Integration
         [Test]
         public async Task UpdateTest01()
         {
-            await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+            await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
             {
                 SetUpAsync = async tsc =>
                 {
@@ -64,7 +64,7 @@ namespace TodoLists.Tests.Integration
         [Test]
         public async Task UpdateTest02()
         {
-            await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+            await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
             {
                 SetUpAsync = async tsc =>
                 {

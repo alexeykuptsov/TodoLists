@@ -16,9 +16,9 @@ public sealed class Browser : IDisposable
     public Browser()
     {
         Driver = ChromeDriverFactory.CreateChromeDriver();
-        Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3))
+        Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10))
         {
-            PollingInterval = TimeSpan.FromMilliseconds(200),
+            PollingInterval = TimeSpan.FromMilliseconds(300),
         };
         Wait.IgnoreExceptionTypes(typeof(AssertionException));
         Wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));

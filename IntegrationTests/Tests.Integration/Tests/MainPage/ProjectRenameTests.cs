@@ -1,14 +1,13 @@
 using OpenQA.Selenium;
-using TodoLists.Tests.Integration.Arranging;
 
-namespace TodoLists.Tests.Integration;
+namespace TodoLists.Tests.Integration.Tests.MainPage;
 
 public class ProjectRenameTests
 {
     [Test]
     public async Task RenameProject_ClickEditButtonAndChangeNameThenPressEnter_ShouldUpdateProjectName()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -28,32 +27,15 @@ public class ProjectRenameTests
                 firstRow.EditButton.Click();
                 
                 // Wait for the text editor to appear and become available
-                context.Browser.Wait.Until(_ =>
-                {
-                    try
-                    {
-                        var textEditor = context.Page.ProjectsDataGrid.TextEditor;
-                        return textEditor.FindElementByChain().Displayed;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                });
+                context.Browser.Wait.Until(_ => context.Page.ProjectsDataGrid.TextEditor.FindElementByChain().Displayed);
                 
                 // Edit the project name
                 var textEditor = context.Page.ProjectsDataGrid.TextEditor;
-                var textEditorElement = textEditor.FindElementByChain();
-                textEditorElement.Clear();
-                textEditorElement.SendKeys("Renamed Project");
-                textEditorElement.SendKeys(Keys.Enter);
+                textEditor.Text = "Renamed Project";
                 
                 // Wait for the UI to update and verify the name change
                 context.Browser.Wait.Until(_ =>
-                {
-                    var updatedProjectNames = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
-                    return updatedProjectNames.Count == 1 && updatedProjectNames[0] == "Renamed Project";
-                });
+                    context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList() is ["Renamed Project"]);
                 
                 context.Page.Refresh();
                 
@@ -67,7 +49,7 @@ public class ProjectRenameTests
     [Test]
     public async Task RenameProject_WithMultipleProjects_ShouldOnlyUpdateSelectedProject()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -91,15 +73,8 @@ public class ProjectRenameTests
                 // Wait for the text editor to appear
                 context.Browser.Wait.Until(_ =>
                 {
-                    try
-                    {
-                        var textEditor = context.Page.ProjectsDataGrid.TextEditor;
-                        return textEditor.FindElementByChain().Displayed;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    var textEditor = context.Page.ProjectsDataGrid.TextEditor;
+                    return textEditor.FindElementByChain().Displayed;
                 });
                 
                 // Edit the project name
@@ -111,10 +86,8 @@ public class ProjectRenameTests
                 
                 // Wait for the UI to update and verify only the selected project was renamed
                 context.Browser.Wait.Until(_ =>
-                {
-                    var updatedProjectNames = context.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
-                    return updatedProjectNames.Count == 3 && updatedProjectNames[1] == "Modified Project B";
-                });
+                    context.Page.ProjectsDataGrid.Rows
+                        .Select(x => x.Cells[1].Text).ToList() is [_, "Modified Project B", _]);
                 
                 context.Page.Refresh();
 
@@ -128,7 +101,7 @@ public class ProjectRenameTests
     [Test]
     public async Task RenameProject_EmptyName_ShouldRevertToOriginalName()
     {
-        await TestsDecorators.Default(new TestDecoratorOptions<MainPage>
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
         {
             SetUpAsync = async context =>
             {
@@ -148,18 +121,7 @@ public class ProjectRenameTests
                 firstRow.EditButton.Click();
                 
                 // Wait for the text editor to appear
-                context.Browser.Wait.Until(_ =>
-                {
-                    try
-                    {
-                        var textEditor = context.Page.ProjectsDataGrid.TextEditor;
-                        return textEditor.FindElementByChain().Displayed;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                });
+                context.Browser.Wait.Until(_ => context.Page.ProjectsDataGrid.TextEditor.FindElementByChain().Displayed);
                 
                 // Try to set empty name
                 var textEditor = context.Page.ProjectsDataGrid.TextEditor;
