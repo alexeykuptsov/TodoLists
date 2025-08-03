@@ -16,4 +16,8 @@ if (authToken !== null) {
 const data = {
     userName: userName,
 };
-createApp(App, data).mount('#app');
+
+// Create Vue app with error handling
+const app = createApp(App, data);
+
+app.mount('#app');
