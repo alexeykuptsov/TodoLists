@@ -100,7 +100,7 @@ export default {
           fetch(config.apiBaseUrl + 'api/Auth/Login', {
             method: 'POST',
             headers: {
-              'Accept': 'text',
+              'Accept': 'application/json',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(userDto),
@@ -112,10 +112,12 @@ export default {
               if (!response.ok) {
                 throw new Error("HTTP status " + response.status);
               }
-              return response.text();
+              return response.json();
             })
-            .then(token => {
-              localStorage.setItem('authToken', token);
+            .then(authResponse => {
+              // Store both access and refresh tokens
+              localStorage.setItem('authToken', authResponse.accessToken);
+              localStorage.setItem('refreshToken', authResponse.refreshToken);
               document.location.reload();
             })
             .catch(error => notify('Failed to sign in.', error));
