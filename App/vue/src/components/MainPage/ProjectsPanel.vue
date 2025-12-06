@@ -171,7 +171,7 @@ export default {
     <template #cloneButton>
       <DxButton
         :class="{ 'se-clone-button': true }"
-        icon="copy"
+        text="Clone"
         @click="cloneProject"
       />
     </template>

@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "core-js": "^3.38.1",
-    "devextreme": "~22.1.14",
-    "devextreme-vue": "~22.1.14",
+    "devextreme": "23.1.15",
+    "devextreme-vue": "23.1.15",
     "jquery": "^3.7.1",
-    "splitpanes": "^3.1.5",
-    "vue": "^3.5.12"
+    "splitpanes": "^4.0.4",
+    "vue": "^3.5.18"
   },
   "devDependencies": {
     "@babel/core": "^7.25.8",

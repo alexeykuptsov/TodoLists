@@ -63,6 +63,18 @@ try
         };
     });
 
+    // Add CORS configuration
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowVueApp", policy =>
+        {
+            policy.WithOrigins("http://localhost:8080", "https://localhost:8080")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    });
+
     var app = builder.Build();
 
     string wwwrootDir;
@@ -87,6 +99,9 @@ try
     });
 
     app.UseHttpsRedirection();
+
+    // Enable CORS
+    app.UseCors("AllowVueApp");
 
     app.UseAuthentication();
     app.UseAuthorization();

@@ -56,6 +56,8 @@ In Rider:
 
 2. Debug configuration "App: index.html" (`Ctrl+F9` in Rider).
 
+Local test credentials are: profile `dev`, user `user`, password `pass`.
+
 ### Tests
 
 Integration tests (project `Tests.Integration`) are supposed to be run locally and the web app is running.
