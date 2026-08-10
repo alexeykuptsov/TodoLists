@@ -9,7 +9,7 @@ namespace TodoLists.Analyzers;
 public class FileLengthAnalyzer : DiagnosticAnalyzer
 {
     public static readonly DiagnosticDescriptor FileTooLongRule = new DiagnosticDescriptor(
-        "AK0001",
+        "TL0001",
         "File is too long",
         "File '{0}' has {1} lines, which exceeds the recommended maximum of 200 lines",
         "Maintainability",
@@ -71,6 +71,10 @@ public class FileLengthAnalyzer : DiagnosticAnalyzer
         // Skip generated files
         if (IsGeneratedFile(fileName, filePath))
             return;
+        
+        // Skip library files
+        if (IsLibraryFile(fileName, filePath))
+            return;
 
         // Only analyze specific file types
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
@@ -131,6 +135,16 @@ public class FileLengthAnalyzer : DiagnosticAnalyzer
             filePath.Contains("/.git/") ||
             fileName.StartsWith("package-lock.") ||
             fileName.Equals("package.json"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+    private static bool IsLibraryFile(string filePath)
+    {
+        if (filePath.Contains("\\lib\\") ||
+            filePath.Contains("/lib/"))
         {
             return true;
         }

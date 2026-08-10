@@ -1,3 +1,5 @@
-Read the project summary from `README.md`.
+Ask me questions about features I want to implement, then create a prompt to implement these features.
 
-Read technical specification from `TECHNICAL_SPECIFICATION.md`.
+*PROMPT BODY*
+
+The result of your work should be a Markdown text in a code block (so that I can copy it to the clipboard).
