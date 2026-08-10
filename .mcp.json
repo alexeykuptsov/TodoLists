@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://dev__todo_lists_app:dev__todo_lists_app@localhost:5432/dev__todo_lists_app"
+      ],
+      "env": {}
+    }
+  }
+}
