@@ -562,3 +562,4 @@ FodyWeavers.xsd
 /wwwroot
 appsettings.Production.json
 *.orig
+/.idea/.idea.TodoLists/.idea/db-forest-config.xml
