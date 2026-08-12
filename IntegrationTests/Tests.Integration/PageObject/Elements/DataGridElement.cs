@@ -1,17 +1,17 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 
 namespace TodoLists.Tests.Integration.PageObject.Elements;
 
 public class DataGridElement : BaseElement
 {
     public ButtonElement AddRowButton { get; }
-    public TextBoxElement TextEditor { get; } 
+    public TextBoxElement TextEditor { get; }
 
     public DataGridElement(Browser browser, IEnumerable<By> webElementLocatorsChain)
         : base(browser, webElementLocatorsChain)
     {
-        AddRowButton = new ButtonElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-datagrid-addrow-button")));
-        TextEditor = new TextBoxElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-texteditor-input")));
+        AddRowButton = new ButtonElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".se-add-row-button")));
+        TextEditor = new TextBoxElement(Browser, WebElementLocatorsChain.Append(By.CssSelector(".se-text-editor-input")));
         CloneButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".se-clone-button")));
     }
 
@@ -19,7 +19,7 @@ public class DataGridElement : BaseElement
     {
         get
         {
-            var rowItemCssSelectorText = ".dx-data-row";
+            var rowItemCssSelectorText = ".se-data-row";
             var rowElements = FindElementsByChain(WebElementLocatorsChain.Append(By.CssSelector(rowItemCssSelectorText)).ToList());
             var result = new List<DataGridRowElement>();
             for (int i = 0; i < rowElements.Count; i++)
@@ -31,9 +31,9 @@ public class DataGridElement : BaseElement
             return result;
         }
     }
-    
+
     public ButtonElement CloneButton { get; }
-    
+
     public void DragRowBeforePosition(int sourceRowIndex, int targetRowIndex)
     {
         var draggableRows = Rows;
