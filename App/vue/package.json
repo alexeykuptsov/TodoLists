@@ -10,12 +10,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@primevue/themes": "^4.5.4",
     "core-js": "^3.38.1",
-    "devextreme": "23.1.15",
-    "devextreme-vue": "23.1.15",
     "jquery": "^3.7.1",
+    "primeicons": "^8.0.0",
+    "primevue": "^4.5.5",
     "splitpanes": "^4.0.4",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.8",

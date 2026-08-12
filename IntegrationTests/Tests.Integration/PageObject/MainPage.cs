@@ -20,7 +20,7 @@ public class MainPage : BasePage
         ProjectsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-projects-data-grid") });
         TodoItemsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-todo-items-data-grid") });
         ProjectNameLabel = new LabelElement(Browser, new[] { By.CssSelector("#project-name") });
-        DeleteDialog = new DeleteDialogElement(Browser, new[] { By.CssSelector(".dx-dialog") });
+        DeleteDialog = new DeleteDialogElement(Browser, new[] { By.CssSelector(".se-dialog") });
     }
 
     public override void WaitUntilLoaded()
@@ -30,12 +30,12 @@ public class MainPage : BasePage
     }
 
     public List<string> TodoItemNames => Browser.Driver
-        .FindElements(By.CssSelector(".se-todo-items-data-grid .dx-datagrid .dx-data-row td[aria-colindex='2']"))
+        .FindElements(By.CssSelector(".se-todo-items-data-grid .se-data-row td:nth-child(2)"))
         .Select(x => x.Text)
         .ToList();
 
     public List<String> ErrorMessages => Browser.Driver
-        .FindElements(By.CssSelector(".dx-toast-content"))
+        .FindElements(By.CssSelector(".se-toast-message"))
         .Select(x => x.Text)
         .ToList();
 }

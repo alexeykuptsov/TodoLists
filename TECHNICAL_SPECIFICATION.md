@@ -29,7 +29,7 @@ The TodoLists application is a comprehensive multi-tenant task management system
 
 ### 1.3 Technology Stack
 - **Backend**: ASP.NET Core 7.0 Web API
-- **Frontend**: Vue.js 3 with DevExtreme UI components
+- **Frontend**: Vue.js 3 with PrimeVue UI components
 - **Database**: PostgreSQL with Entity Framework Core
 - **Desktop**: WPF launcher application
 - **Authentication**: JWT Bearer tokens
@@ -51,7 +51,7 @@ graph TB
     
     subgraph "Presentation Layer"
         Vue[Vue.js 3 SPA]
-        DevExtreme[DevExtreme UI Components]
+        PrimeVue[PrimeVue UI Components]
     end
     
     subgraph "Application Layer"
@@ -304,8 +304,8 @@ erDiagram
 **Security**: Requires authentication
 
 #### PATCH /api/Projects
-**Purpose**: Bulk update projects (DevExtreme format)
-**Request Body**: Array of change operations
+**Purpose**: Bulk update projects
+**Request Body**: Array of change operations in the format `[{ type: "insert"|"update"|"remove", data?: {...}, key?: id }]`
 **Response**: Success confirmation
 **Security**: Requires authentication
 
@@ -325,8 +325,8 @@ erDiagram
 **Security**: Requires authentication
 
 #### PATCH /api/TodoItems
-**Purpose**: Bulk update tasks (DevExtreme format)
-**Request Body**: Array of change operations
+**Purpose**: Bulk update tasks
+**Request Body**: Array of change operations in the format `[{ key: id, data: { field: value } }]`
 **Response**: Success confirmation
 **Security**: Requires authentication
 
@@ -392,20 +392,20 @@ App.vue (Root)
 
 **MainPanel Component** ([`MainPanel.vue`](App/vue/src/components/MainPanel.vue))
 - Split-pane layout using Splitpanes library
-- Real-time task management with DevExtreme DataGrid
+- Real-time task management with PrimeVue DataTable
 - Project-task relationship handling
 - Inline editing capabilities
 
 **LoginButton Component** ([`LoginButton.vue`](App/vue/src/components/LoginButton.vue))
-- DevExtreme Form-based authentication
-- Profile and user credential input
+- PrimeVue Popover-based authentication form
+- Profile and user credential input (PrimeVue InputText)
 - JWT token storage and management
 - Popover-based UI presentation
 
 **ProjectsPanel Component** ([`ProjectsPanel.vue`](App/vue/src/components/MainPage/ProjectsPanel.vue))
-- DevExtreme DataGrid for project management
-- Drag-and-drop reordering with immediate UI feedback
-- Inline editing and deletion
+- Custom table with vuedraggable for project management
+- Drag-and-drop reordering with immediate UI feedback (vuedraggable + forceFallback)
+- Inline editing and deletion with PrimeVue Dialog for confirmations
 - Project cloning functionality
 - Custom order persistence and synchronization
 
@@ -425,16 +425,17 @@ App.vue (Root)
 
 ### 5.3 UI Framework Integration
 
-#### 5.3.1 DevExtreme Components
-- **DataGrid**: Primary data display and editing
-- **Form**: Structured input handling
+#### 5.3.1 PrimeVue Components
+- **DataTable + Column**: Todo items table with inline cell editing
+- **InputText**: Text input fields
 - **Button**: Action triggers
-- **Popover**: Modal-like interactions
-- **Notify**: User feedback system
+- **Popover**: Login overlay
+- **Dialog**: Delete confirmation modal
+- **Toast**: User feedback / error notifications (via ToastService)
 
-#### 5.3.2 Layout Management
+#### 5.3.2 Additional Libraries
+- **vuedraggable** (SortableJS wrapper): Row drag-and-drop for project reordering (`forceFallback: true` for Selenium compatibility)
 - **Splitpanes**: Resizable panel layout
-- **Responsive Design**: Automatic sizing adjustments
 - **CSS Grid/Flexbox**: Modern layout techniques
 
 ### 5.4 Build and Development
@@ -453,15 +454,15 @@ App.vue (Root)
 ### 5.5 Drag-and-Drop Functionality
 
 #### 5.5.1 Project Reordering
-- **DevExtreme RowDragging**: Built-in drag-and-drop support
+- **vuedraggable**: Drag-and-drop via SortableJS with `forceFallback: true` (required for Selenium `ClickAndHold` simulation)
 - **Real-time Updates**: Immediate UI feedback during reordering
-- **Backend Synchronization**: Automatic order persistence to database
+- **Backend Synchronization**: Automatic order persistence to database via `POST /api/Projects/Reorder`
 - **Error Handling**: Graceful fallback with data refresh on failures
 
 #### 5.5.2 Implementation Details
-- **Event Handling**: `@reorder` event captures drag-and-drop operations
-- **Order Calculation**: Client-side array manipulation for new sequence
-- **API Integration**: RESTful endpoint for order updates
+- **Event Handling**: `@end` event on vuedraggable captures drop
+- **Order Calculation**: Client-side array mutation for new sequence
+- **API Integration**: `POST /api/Projects/Reorder` with `{ projectIds: [...] }`
 - **State Management**: Local array updates for immediate UI response
 - **Data Consistency**: Server-side validation and persistence
 
@@ -508,7 +509,7 @@ App.vue (Root)
 - **XSS Protection**: Input encoding and validation
 
 #### 6.3.2 Client-Side Validation
-- **Form Validation**: DevExtreme validation rules
+- **Form Validation**: HTML5 and custom Vue validation
 - **Input Sanitization**: Client-side data cleaning
 - **CSRF Protection**: SameSite cookie attributes
 
@@ -542,7 +543,7 @@ App.vue (Root)
 - **Build Process**: Vue CLI production build
 - **Static Files**: Served via ASP.NET Core static file middleware
 - **Asset Optimization**: Minification and bundling
-- **CDN Integration**: DevExtreme library serving
+- **Libraries**: PrimeVue, vuedraggable, and primeicons bundled via npm
 
 #### 7.1.3 Desktop Launcher
 - **WPF Application**: Windows-specific deployment
@@ -729,7 +730,8 @@ App.vue (Root)
 ### 9.4 Integration Requirements
 
 #### 9.4.1 External Dependencies
-- **DevExtreme**: UI component library
+- **PrimeVue**: UI component library (MIT-licensed)
+- **vuedraggable**: SortableJS wrapper for Vue 3 drag-and-drop
 - **PostgreSQL**: Database system
 - **Serilog**: Logging framework
 - **Entity Framework**: ORM framework

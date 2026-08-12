@@ -37,7 +37,7 @@ public sealed class Browser : IDisposable
         var loginPopoverLinkElement = Driver.FindElement(By.Id("loginPopoverLink"));
         loginPopoverLinkElement.Click();
 
-        Wait.Until(d => d.FindElement(By.ClassName("dx-popup-content")));
+        Wait.Until(d => d.FindElement(By.Name("profile")).Displayed);
 
         Driver.FindElement(By.XPath("//input[@name='profile']")).SendKeys(profileName);
         Driver.FindElement(By.XPath("//input[@name='username']")).SendKeys(username);

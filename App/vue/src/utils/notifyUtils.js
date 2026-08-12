@@ -1,39 +1,18 @@
-﻿import $ from "jquery";
-import notify from "devextreme/ui/notify";
+let _toast = null;
+
+export function setToast(toast) {
+  _toast = toast;
+}
 
 export function notifySystemError(message, error) {
-  // noinspection JSUnusedGlobalSymbols
-  let notifyToastOptions = {
-    type: 'error',
-    displayTime: 5000,
-    contentTemplate(element) {
-      const $rootDiv = $('<div>')
-
-      const $text = $('<div>').text(message);
-      $rootDiv.append($text);
-
-      const $copyLink = $('<a>')
-        .attr('href', '#')
-        .attr('onclick', `navigator.clipboard.writeText('${message}');`)
-        .attr('style', 'color: #99ddff;')
-        .text('Копировать текст ошибки');
-      $rootDiv.append($copyLink);
-
-      $(element).append($rootDiv);
-    }
-  };
-  // noinspection JSCheckFunctionSignatures
-  notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
-  console.error(error != null ? message + '\n' + error.stack : message);
+  if (_toast) {
+    _toast.add({ severity: 'error', summary: message, life: 5000 });
+  }
+  console.error(error != null ? message + '\n' + (error.stack || error) : message);
 }
 
 export function notifyValidationError(message) {
-  // noinspection JSUnusedGlobalSymbols
-  let notifyToastOptions = {
-    type: 'error',
-    displayTime: 50000,
-    message: message,
-  };
-  // noinspection JSCheckFunctionSignatures
-  notify(notifyToastOptions, { position: "bottom", direction: "up-push" });
+  if (_toast) {
+    _toast.add({ severity: 'error', summary: message, life: 50000 });
+  }
 }

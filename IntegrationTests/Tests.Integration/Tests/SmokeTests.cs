@@ -23,7 +23,7 @@ public class SmokeTests
         var loginPopoverLinkElement = chromeDriver.FindElement(By.Id("loginPopoverLink"));
         loginPopoverLinkElement.Click();
 
-        wait.Until(d => d.FindElement(By.ClassName("dx-popup-content")));
+        wait.Until(d => d.FindElement(By.Name("profile")).Displayed);
 
         chromeDriver.FindElement(By.XPath("//input[@name='profile']")).SendKeys("dev");
         chromeDriver.FindElement(By.XPath("//input[@name='username']")).SendKeys("user");

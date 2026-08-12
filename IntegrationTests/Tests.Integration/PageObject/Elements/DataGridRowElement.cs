@@ -8,8 +8,8 @@ public class DataGridRowElement : BaseElement
     public DataGridRowElement(Browser browser, IEnumerable<By> webElementLocatorsChain)
         : base(browser, webElementLocatorsChain)
     {
-        DeleteButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-link-delete")));
-        EditButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".dx-link-edit")));
+        DeleteButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".se-delete-button")));
+        EditButton = new ButtonElement(browser, WebElementLocatorsChain.Append(By.CssSelector(".se-edit-button")));
     }
 
     public List<DataGridCellElement> Cells
@@ -42,7 +42,7 @@ public class DataGridRowElement : BaseElement
     {
         get
         {
-            return FindElementByChain(WebElementLocatorsChain.Append(By.CssSelector(".dx-datagrid-drag-icon")).ToList());
+            return FindElementByChain(WebElementLocatorsChain.Append(By.CssSelector(".se-drag-handle")).ToList());
         }
     }
 
@@ -50,39 +50,41 @@ public class DataGridRowElement : BaseElement
     {
         var sourceElement = DragHandle;
         var targetElement = targetRow.FindElementByChain();
-        
-        // Calculate position at 1/5 from the top of the target row
+
+        // SortableJS with forceFallback:true needs a pause after mousedown to register drag start
         var targetSize = targetElement.Size;
-        var targetLocation = targetElement.Location;
-        var offsetY = (int)(targetSize.Height * 0.2); // 1/5 from top
-        
+        var offsetY = (int)(targetSize.Height * 0.2) - targetSize.Height / 2;
+
         var actions = new Actions(Browser.Driver);
         actions.ClickAndHold(sourceElement)
-            .MoveToElement(targetElement, 0, offsetY - (targetSize.Height / 2)) // Offset from center
+            .Pause(TimeSpan.FromMilliseconds(400))
+            .MoveByOffset(0, 2)
+            .MoveToElement(targetElement, 0, offsetY)
+            .Pause(TimeSpan.FromMilliseconds(100))
             .Release()
             .Perform();
-        
-        // Wait for the drag operation to complete
-        Thread.Sleep(500);
+
+        Thread.Sleep(800);
     }
 
     public void DragAfterRow(DataGridRowElement targetRow)
     {
         var sourceElement = DragHandle;
         var targetElement = targetRow.FindElementByChain();
-        
-        // Calculate position at 1/5 from the bottom of the target row
+
+        // SortableJS with forceFallback:true needs a pause after mousedown to register drag start
         var targetSize = targetElement.Size;
-        var targetLocation = targetElement.Location;
-        var offsetY = (int)(targetSize.Height * 0.8); // 4/5 from top (1/5 from bottom)
-        
+        var offsetY = (int)(targetSize.Height * 0.8) - targetSize.Height / 2;
+
         var actions = new Actions(Browser.Driver);
         actions.ClickAndHold(sourceElement)
-            .MoveToElement(targetElement, 0, offsetY - (targetSize.Height / 2)) // Offset from center
+            .Pause(TimeSpan.FromMilliseconds(400))
+            .MoveByOffset(0, 2)
+            .MoveToElement(targetElement, 0, offsetY)
+            .Pause(TimeSpan.FromMilliseconds(100))
             .Release()
             .Perform();
-        
-        // Wait for the drag operation to complete
-        Thread.Sleep(500);
+
+        Thread.Sleep(800);
     }
 }

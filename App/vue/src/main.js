@@ -1,5 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import PrimeVue from 'primevue/config'
+import Aura from '@primevue/themes/aura'
+import ToastService from 'primevue/toastservice'
+import 'primeicons/primeicons.css'
 
 let authToken = localStorage.getItem('authToken');
 let userName = null;
@@ -16,4 +20,7 @@ if (authToken !== null) {
 const data = {
     userName: userName,
 };
-createApp(App, data).mount('#app');
+const app = createApp(App, data);
+app.use(PrimeVue, { theme: { preset: Aura } });
+app.use(ToastService);
+app.mount('#app');

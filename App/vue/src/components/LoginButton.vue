@@ -1,147 +1,78 @@
 <template>
   <div>
-    <a id="loginPopoverLink" style="cursor: pointer;">Sign in</a>
-    <div id="loginPopover">
-      <div id="login-form"></div>
-      <div id="login-button"></div>
-    </div>
+    <a id="loginPopoverLink" style="cursor: pointer;" @click="toggle">Sign in</a>
+    <Popover ref="popover">
+      <div style="padding: 16px; min-width: 300px; display: flex; flex-direction: column; gap: 8px;">
+        <InputText name="profile" v-model="loginData.profile" placeholder="Profile" style="width: 100%;" />
+        <InputText name="username" v-model="loginData.username" placeholder="Username" style="width: 100%;" />
+        <InputText name="password" type="password" v-model="loginData.password" placeholder="Password" style="width: 100%;" />
+        <Button id="login-button" label="Sign in" @click="login" />
+      </div>
+    </Popover>
   </div>
 </template>
 
 <script>
-import $ from 'jquery';
-import notify from 'devextreme/ui/notify';
-import Form from 'devextreme/ui/form';
-import Button from 'devextreme/ui/button';
-import Popover from 'devextreme/ui/popover';
+/* eslint-disable vue/no-reserved-component-names */
+import Popover from 'primevue/popover';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import { getConfig } from '@/config';
 
 const config = getConfig();
 
 export default {
   name: 'LoginButton',
-  mounted: function () {
-    this.$nextTick(function () {
-      try {
-        this.initPage();
-      } catch (e) {
-        notify(e.toString() + '\n', 'error', 5000);
-        throw e;
-      }
-    })
+  components: { Popover, InputText, Button },
+  data() {
+    return {
+      loginData: {
+        profile: localStorage.getItem('loginForm.profile') || '',
+        username: '',
+        password: '',
+      },
+    };
+  },
+  mounted() {
+    this.$nextTick(() => {
+      document.getElementById('se-ajax-load-status').innerText = 'complete';
+    });
   },
   methods: {
-    initPage() {
-      let loginFormData = {
-        profile: null,
-        username: null,
-        password: null,
-      };
+    toggle(event) {
+      this.$refs.popover.toggle(event);
+    },
+    async login() {
+      const { profile, username, password } = this.loginData;
+      try {
+        const response = await fetch(config.apiBaseUrl + 'api/Auth/Login', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ profile, username, password }),
+        });
 
-      let previouslyEnteredProfile = localStorage.getItem('loginForm.profile')
-      if (previouslyEnteredProfile !== null) {
-        loginFormData.profile = previouslyEnteredProfile
+        if (response.status === 401) {
+          return;
+        }
+        if (!response.ok) {
+          throw new Error('HTTP status ' + response.status);
+        }
+
+        const authResponse = await response.json();
+        localStorage.setItem('loginForm.profile', profile);
+        localStorage.setItem('authToken', authResponse.accessToken);
+        localStorage.setItem('refreshToken', authResponse.refreshToken);
+        document.location.reload();
+      } catch (error) {
+        console.error('Login failed:', error);
       }
-
-      const loginForm = new Form($('#login-form'), {
-        colCount: 2,
-        labelMode: 'floating',
-        formData: loginFormData,
-        items: [{
-          dataField: 'profile',
-          label: 'Profile',
-          validationRules: [{
-            type: 'required',
-          }],
-        }, {
-          dataField: 'username',
-          label: 'Username',
-          editorOptions: {
-            inputAttr: {
-              type: 'username',
-              autocomplete: 'on',
-            },
-          },
-          validationRules: [{
-            type: 'required',
-          }],
-        }, {
-          dataField: 'password',
-          label: 'Password',
-          editorOptions: {
-            mode: 'password',
-            inputAttr: {
-              type: 'password',
-              autocomplete: 'on',
-            },
-          },
-          validationRules: [{
-            type: 'required',
-            message: 'Password is required',
-          }],
-        }],
-      });
-
-      new Button($('#login-button'), {
-        stylingMode: 'contained',
-        text: 'Sign in',
-        type: 'default',
-        width: 120,
-        onClick() {
-          let userDto = loginForm.option('formData');
-          let validationResult = loginForm.validate();
-          if (!validationResult.isValid) {
-            notify('Failed to sign in.', 'Check credentials input and try again.');
-            return;
-          }
-
-          localStorage.setItem('loginForm.profile', userDto.profile);
-
-          fetch(config.apiBaseUrl + 'api/Auth/Login', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userDto),
-          })
-            .then(response => {
-              if (response.status === 401) {
-                notify('Failed to sign in.', 'Incorrect credentials input.');
-              }
-              if (!response.ok) {
-                throw new Error("HTTP status " + response.status);
-              }
-              return response.json();
-            })
-            .then(authResponse => {
-              // Store both access and refresh tokens
-              localStorage.setItem('authToken', authResponse.accessToken);
-              localStorage.setItem('refreshToken', authResponse.refreshToken);
-              document.location.reload();
-            })
-            .catch(error => notify('Failed to sign in.', error));
-        },
-      });
-
-      new Popover($('#loginPopover'), {
-        target: '#loginPopoverLink',
-        showEvent: 'dxclick',
-        position: 'bottom',
-        width: 500,
-        shading: true,
-        shadingColor: 'rgba(0, 0, 0, 0.5)',
-      });
-
-      document.getElementById('se-ajax-load-status').innerText = 'complete';
-    }
-  }
+    },
+  },
 }
-
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
-
 </style>

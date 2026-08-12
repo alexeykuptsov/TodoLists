@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text.Json;
 using Newtonsoft.Json;
 
 namespace TodoLists.Tests.Integration.Arranging;
@@ -103,7 +104,9 @@ public class TestDataBuilder
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await superUserHttpClient.PostAsync("api/Auth/LoginSuperUser", content);
         response.EnsureSuccessStatusCode();
-        var jwtToken = await response.Content.ReadAsStringAsync();
+        var responseStream = await response.Content.ReadAsStreamAsync();
+        var responseJson = await JsonDocument.ParseAsync(responseStream);
+        var jwtToken = responseJson.RootElement.GetProperty("accessToken").ToString();
         superUserHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
     }
 
@@ -113,7 +116,9 @@ public class TestDataBuilder
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
         var response = await httpClient.PostAsync("api/Auth/Login", content);
         response.EnsureSuccessStatusCode();
-        var jwtToken = await response.Content.ReadAsStringAsync();
+        var responseStream = await response.Content.ReadAsStreamAsync();
+        var responseJson = await JsonDocument.ParseAsync(responseStream);
+        var jwtToken = responseJson.RootElement.GetProperty("accessToken").ToString();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
     }
 }
