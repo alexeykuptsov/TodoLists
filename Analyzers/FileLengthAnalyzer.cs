@@ -73,7 +73,7 @@ public class FileLengthAnalyzer : DiagnosticAnalyzer
             return;
         
         // Skip library files
-        if (IsLibraryFile(fileName, filePath))
+        if (IsLibraryFile(filePath))
             return;
 
         // Only analyze specific file types

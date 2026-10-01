@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>TodoLists.Utils</AssemblyName>
@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Analyzer Include="..\Analyzers\binRelease\net7.0\TodoLists.Analyzers.dll" />
+        <Analyzer Include="..\Analyzers\binRelease\net10.0\TodoLists.Analyzers.dll" />
     </ItemGroup>
 
     <ItemGroup>

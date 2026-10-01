@@ -26,10 +26,10 @@ He installs the app by unpacking a ZIP distributive and following section Gettin
 
 ### After-Checkout Development Environment Setup
 
-Install Postgres 14, .NET 7, Node.js and JetBrains Rider (as a default IDE for this project).
+Install Postgres 14, .NET 10, Node.js and JetBrains Rider (as a default IDE for this project).
 
 ```shell
-dotnet tool install --global dotnet-ef --version 8.0.0
+dotnet tool install --global dotnet-ef --version 10.0.12
 npm install -g @vue/cli
 cd App\vue
 npm install
