@@ -563,3 +563,4 @@ FodyWeavers.xsd
 appsettings.Production.json
 *.orig
 /.idea/.idea.TodoLists/.idea/db-forest-config.xml
+/Analyzers/binRelease/
