@@ -50,6 +50,23 @@ public class TestDataBuilder
         response.EnsureSuccessStatusCode();
     }
 
+    public static async Task<long> CreateProjectTemplateAsync(string name, HttpClient httpClient)
+    {
+        var content = new StringContent($"{{\"name\":\"{name}\"}}");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        var response = await httpClient.PostAsync("api/ProjectTemplates", content);
+        response.EnsureSuccessStatusCode();
+        return long.Parse(await response.Content.ReadAsStringAsync());
+    }
+
+    public static async Task AddProjectTemplateTaskAsync(long templateId, string taskName, HttpClient httpClient)
+    {
+        var content = new StringContent($"{{\"projectTemplateId\":{templateId},\"name\":\"{taskName}\"}}");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        var response = await httpClient.PostAsync("api/ProjectTemplateTasks", content);
+        response.EnsureSuccessStatusCode();
+    }
+
     public static async Task CreateTodoItemAsync(long projectId, string todoItemName, bool isComplete, HttpClient httpClient)
     {
         var content =

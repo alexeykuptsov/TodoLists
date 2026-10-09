@@ -75,6 +75,48 @@ public class ProjectsController : ControllerBase
         return Ok(project.Id);
     }
 
+    [HttpPost("FromTemplate")]
+    public async Task<IActionResult> CreateProjectFromTemplate(CreateProjectFromTemplateRequest request)
+    {
+        return await WithExceptionHandling<IActionResult>(async () =>
+        {
+            var template = await myListsDbContext.ProjectTemplates
+                .Where(t => t.Id == request.TemplateId && t.ProfileId == myProfileId)
+                .Include(t => t.Tasks.OrderBy(i => i.Id))
+                .FirstOrDefaultAsync();
+
+            if (template == null)
+                return BadRequest($"Template '{request.TemplateId}' not found.");
+
+            var maxOrder = await myListsDbContext.Projects
+                .Where(x => x.ProfileId == myProfileId && !x.IsDeleted)
+                .MaxAsync(x => (int?)x.Order) ?? 0;
+
+            var project = new Project
+            {
+                ProfileId = myProfileId,
+                Name = request.Name,
+                IsDeleted = false,
+                Order = maxOrder + 1
+            };
+            myListsDbContext.Projects.Add(project);
+
+            foreach (var item in template.Tasks)
+            {
+                myListsDbContext.TodoItems.Add(new TodoItem
+                {
+                    ProfileId = myProfileId,
+                    Name = item.Name,
+                    IsComplete = false,
+                    Project = project,
+                });
+            }
+
+            await myListsDbContext.SaveChangesAsync();
+            return Ok(project.Id);
+        });
+    }
+
     [HttpPost("Clone")]
     public async Task<ActionResult<IEnumerable<ProjectDto>>> CloneProject(CloneProjectDto clonedProjectDto)
     {
