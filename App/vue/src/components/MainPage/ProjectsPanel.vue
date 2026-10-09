@@ -4,7 +4,7 @@
     <div class="se-projects-data-grid">
       <div style="margin-bottom: 8px; display: flex; gap: 4px;">
         <Button class="se-clone-button" label="Clone" @click="cloneProject" />
-        <Button class="se-add-row-button" label="+" @click="addNewProject" />
+        <Button class="se-add-row-button" label="New project" @click="openNewProjectModal" />
       </div>
       <table style="width: 100%; border-collapse: collapse;">
         <draggable
@@ -43,19 +43,6 @@
                     />
                   </div>
                 </template>
-                <template v-else-if="project._isNew">
-                  <div class="se-text-box">
-                    <InputText
-                      ref="newProjectInput"
-                      class="se-text-editor-input"
-                      v-model="newProjectName"
-                      @keydown.enter.stop="saveNewProject()"
-                      @keydown.escape.stop="cancelNewProject()"
-                      @click.stop
-                      style="width: 100%;"
-                    />
-                  </div>
-                </template>
                 <template v-else>{{ project.name }}</template>
               </td>
               <td style="padding: 4px; white-space: nowrap; width: 56px;">
@@ -63,7 +50,7 @@
                   <Button icon="pi pi-check" text rounded @click.stop="saveEdit(project)" />
                   <Button icon="pi pi-times" text rounded @click.stop="cancelEdit" />
                 </template>
-                <template v-else-if="!project._isNew">
+                <template v-else>
                   <Button class="se-edit-button" icon="pi pi-pencil" text rounded @click.stop="startEdit(project)" />
                   <Button class="se-delete-button" icon="pi pi-trash" text rounded severity="danger" @click.stop="confirmDelete(project)" />
                 </template>
@@ -87,6 +74,8 @@
         <Button label="No" @click="deleteDialogVisible = false" />
       </template>
     </Dialog>
+
+    <NewProjectModal v-model:visible="showNewProjectModal" @project-created="refreshData" />
   </div>
 </template>
 
@@ -96,13 +85,14 @@ import draggable from 'vuedraggable';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import NewProjectModal from './NewProjectModal.vue';
 import * as fetchUtils from '@/utils/fetchUtils.js';
 import * as notifyUtils from "@/utils/notifyUtils";
 
 export default {
   name: 'ProjectsPanel',
   emits: ['focused-project-changed'],
-  components: { draggable, InputText, Button, Dialog },
+  components: { draggable, InputText, Button, Dialog, NewProjectModal },
   data() {
     return {
       projects: [],
@@ -110,9 +100,9 @@ export default {
       focusedProject: null,
       editingProjectId: null,
       editingName: '',
-      newProjectName: '',
       deleteDialogVisible: false,
       projectToDelete: null,
+      showNewProjectModal: false,
     };
   },
   mounted() {
@@ -134,7 +124,6 @@ export default {
 
       this.editingProjectId = null;
       this.editingName = '';
-      this.newProjectName = '';
 
       const projectToFocus =
         this.projects.find(p => p.id === previousFocusedId) || this.projects[0];
@@ -145,41 +134,12 @@ export default {
       }
     },
     selectProject(project) {
-      if (project._isNew || this.editingProjectId === project.id) return;
+      if (this.editingProjectId === project.id) return;
       this.focusedProject = project;
       this.$emit('focused-project-changed', { row: { data: project } });
     },
-    addNewProject() {
-      this.newProjectName = '';
-      const newProject = { id: null, name: '', order: 0, _isNew: true };
-      this.projects.push(newProject);
-      this.$nextTick(() => {
-        const input = this.$refs.newProjectInput;
-        if (input) {
-          const el = Array.isArray(input) ? input[input.length - 1] : input;
-          const domEl = el.$el || el;
-          if (domEl && domEl.focus) domEl.focus();
-        }
-      });
-    },
-    async saveNewProject() {
-      if (!this.newProjectName.trim()) {
-        this.cancelNewProject();
-        return;
-      }
-      const name = this.newProjectName.trim();
-      this.newProjectName = '';
-      try {
-        await fetchUtils.post(this.projectsUri, { name });
-        this.refreshData();
-      } catch (error) {
-        notifyUtils.notifySystemError('Unable to add project.', error);
-      }
-    },
-    cancelNewProject() {
-      const idx = this.projects.findIndex(p => p._isNew);
-      if (idx !== -1) this.projects.splice(idx, 1);
-      this.newProjectName = '';
+    openNewProjectModal() {
+      this.showNewProjectModal = true;
     },
     startEdit(project) {
       this.editingProjectId = project.id;
@@ -213,7 +173,7 @@ export default {
       this.editingName = '';
     },
     confirmDelete(project) {
-      if (this.projects.filter(p => !p._isNew).length === 1) {
+      if (this.projects.length === 1) {
         notifyUtils.notifyValidationError(
           'It is impossible to delete the last project. There should be at least one.');
         return;

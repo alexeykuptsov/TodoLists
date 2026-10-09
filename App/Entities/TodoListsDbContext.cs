@@ -15,6 +15,15 @@ public class TodoListsDbContext : DbContext
         modelBuilder.UseSerialColumns();
         
         // Configure RefreshToken entity
+        modelBuilder.Entity<ProjectTemplate>(entity =>
+        {
+            entity.HasIndex(t => new { t.ProfileId, t.Id });
+            entity.HasMany(t => t.Tasks)
+                  .WithOne(i => i.ProjectTemplate)
+                  .HasForeignKey(i => i.ProjectTemplateId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             // Configure table name to use snake_case
@@ -56,4 +65,6 @@ public class TodoListsDbContext : DbContext
     public DbSet<TodoItem> TodoItems { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<ProjectTemplate> ProjectTemplates { get; set; } = null!;
+    public DbSet<ProjectTemplateTask> ProjectTemplateTasks { get; set; } = null!;
 }

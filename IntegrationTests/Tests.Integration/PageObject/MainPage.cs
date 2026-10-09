@@ -12,6 +12,7 @@ public class MainPage : BasePage
     public DataGridElement TodoItemsDataGrid { get; }
     public LabelElement ProjectNameLabel { get; }
     public DeleteDialogElement DeleteDialog { get; }
+    public NewProjectDialogElement NewProjectDialog { get; }
 
     public MainPage(Browser browser) : base(browser)
     {
@@ -21,6 +22,7 @@ public class MainPage : BasePage
         TodoItemsDataGrid = new DataGridElement(Browser, new[] { By.CssSelector(".se-todo-items-data-grid") });
         ProjectNameLabel = new LabelElement(Browser, new[] { By.CssSelector("#project-name") });
         DeleteDialog = new DeleteDialogElement(Browser, new[] { By.CssSelector(".se-dialog") });
+        NewProjectDialog = new NewProjectDialogElement(Browser, new[] { By.CssSelector(".se-new-project-dialog") });
     }
 
     public override void WaitUntilLoaded()

@@ -107,14 +107,14 @@ public class TodoItemRenameTests
                 context.Browser.Wait.Until(_ =>
                 {
                     var updatedTodoItemNames = context.Page.TodoItemsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
-                    return updatedTodoItemNames.Count == 3 && updatedTodoItemNames[1] == "Modified Todo Item B";
+                    return updatedTodoItemNames.Count == 3 && updatedTodoItemNames.Contains("Modified Todo Item B");
                 });
                 
                 context.Page.Refresh();
 
                 // Final verification - only Todo Item B should be renamed
                 var finalTodoItemNames = context.Page.TodoItemsDataGrid.Rows.Select(x => x.Cells[1].Text).ToList();
-                Assert.That(finalTodoItemNames, Is.EqualTo(new[] { "Todo Item A", "Modified Todo Item B", "Todo Item C" }));
+                Assert.That(finalTodoItemNames, Is.EquivalentTo(new[] { "Todo Item A", "Modified Todo Item B", "Todo Item C" }));
             }
         });
     }

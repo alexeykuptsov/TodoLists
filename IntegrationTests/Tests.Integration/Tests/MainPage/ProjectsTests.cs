@@ -95,11 +95,9 @@ public class ProjectsTests
     {
         await TestsDecorators.Default(tc =>
         {
-            // Keep default setup
-
             tc.Page.ProjectsDataGrid.AddRowButton.Click();
-            tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
-            tc.Page.ProjectsDataGrid.TextEditor.Text = "Foo";
+            tc.Browser.Wait.Until(_ => tc.Page.NewProjectDialog.Displayed);
+            tc.Page.NewProjectDialog.ProjectNameInput.Text = "Foo";
 
             tc.Browser.WaitAndAssertThat(
                 () => tc.Page.ProjectsDataGrid.Rows.Select(x => x.Cells[1].Text),
@@ -120,8 +118,9 @@ public class ProjectsTests
                 tc.Browser.Wait.Until(_ => tc.Page.TodoItemNames.Count == 1);
                 // Add project "Bar"
                 tc.Page.ProjectsDataGrid.AddRowButton.Click();
+                tc.Browser.Wait.Until(_ => tc.Page.NewProjectDialog.Displayed);
+                tc.Page.NewProjectDialog.ProjectNameInput.Text = "Bar";
                 tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
-                tc.Page.ProjectsDataGrid.TextEditor.Text = "Bar";
 
                 await Task.Delay(500);
                 tc.Page.ProjectsDataGrid.Rows[1].Cells[1].Click();
@@ -157,6 +156,35 @@ public class ProjectsTests
                 Assert.That(tc.Page.ProjectsDataGrid.Rows[2].Cells[1].Text, Is.EqualTo("Foo"));
                 tc.Page.ProjectsDataGrid.Rows[2].Cells[1].Click();
                 tc.Browser.WaitAndAssertThat(() => tc.Page.TodoItemNames, Is.EqualTo(new[] { "Bar", "Buz" }));
+            },
+        });
+    }
+
+    [Test]
+    public async Task FromTemplate01()
+    {
+        await TestsDecorators.Default(new TestDecoratorOptions<PageObject.MainPage>
+        {
+            SetUpAsync = async tsc =>
+            {
+                using var httpClient = await TestDataBuilder.CreateHttpClientAndAuthenticateAsync(
+                    tsc.ProfileName, TestDataBuilder.DefaultUserName);
+                var templateId = await TestDataBuilder.CreateProjectTemplateAsync("Shopping list", httpClient);
+                await TestDataBuilder.AddProjectTemplateTaskAsync(templateId, "Milk", httpClient);
+                await TestDataBuilder.AddProjectTemplateTaskAsync(templateId, "Eggs", httpClient);
+                await TestDataBuilder.AddProjectTemplateTaskAsync(templateId, "Bread", httpClient);
+            },
+            Test = tc =>
+            {
+                tc.Page.ProjectsDataGrid.AddRowButton.Click();
+                tc.Browser.Wait.Until(_ => tc.Page.NewProjectDialog.Displayed);
+                tc.Page.NewProjectDialog.SelectTemplate("Shopping list");
+                tc.Page.NewProjectDialog.ProjectNameInput.Text = "My Shopping";
+
+                tc.Browser.Wait.Until(_ => tc.Page.ProjectsDataGrid.Rows.Count == 2);
+                tc.Page.ProjectsDataGrid.Rows[1].Cells[1].Click();
+                tc.Browser.WaitAndAssertThat(() => tc.Page.TodoItemNames,
+                    Is.EqualTo(new[] { "Milk", "Eggs", "Bread" }));
             },
         });
     }

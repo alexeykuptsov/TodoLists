@@ -17,7 +17,7 @@ namespace TodoLists.App.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.18")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseSerialColumns(modelBuilder);
@@ -82,6 +82,65 @@ namespace TodoLists.App.Migrations
                         .HasDatabaseName("ix_projects_profile_id");
 
                     b.ToTable("projects", (string)null);
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.ProjectTemplate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<long>("ProfileId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("profile_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project_templates");
+
+                    b.HasIndex("ProfileId", "Id")
+                        .HasDatabaseName("ix_project_templates_profile_id_id");
+
+                    b.ToTable("project_templates", (string)null);
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.ProjectTemplateTask", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<long>("ProfileId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("profile_id");
+
+                    b.Property<long>("ProjectTemplateId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("project_template_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project_template_tasks");
+
+                    b.HasIndex("ProfileId")
+                        .HasDatabaseName("ix_project_template_tasks_profile_id");
+
+                    b.HasIndex("ProjectTemplateId")
+                        .HasDatabaseName("ix_project_template_tasks_project_template_id");
+
+                    b.ToTable("project_template_tasks", (string)null);
                 });
 
             modelBuilder.Entity("TodoLists.App.Entities.RefreshToken", b =>
@@ -275,6 +334,39 @@ namespace TodoLists.App.Migrations
                     b.Navigation("Profile");
                 });
 
+            modelBuilder.Entity("TodoLists.App.Entities.ProjectTemplate", b =>
+                {
+                    b.HasOne("TodoLists.App.Entities.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_templates_profiles_profile_id");
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.ProjectTemplateTask", b =>
+                {
+                    b.HasOne("TodoLists.App.Entities.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_template_tasks_profiles_profile_id");
+
+                    b.HasOne("TodoLists.App.Entities.ProjectTemplate", "ProjectTemplate")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProjectTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_template_tasks_project_templates_project_template_id");
+
+                    b.Navigation("Profile");
+
+                    b.Navigation("ProjectTemplate");
+                });
+
             modelBuilder.Entity("TodoLists.App.Entities.RefreshToken", b =>
                 {
                     b.HasOne("TodoLists.App.Entities.SuperUser", "SuperUser")
@@ -325,6 +417,11 @@ namespace TodoLists.App.Migrations
                         .HasConstraintName("fk_users_profiles_profile_id");
 
                     b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("TodoLists.App.Entities.ProjectTemplate", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

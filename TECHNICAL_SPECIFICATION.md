@@ -28,12 +28,12 @@ The TodoLists application is a comprehensive multi-tenant task management system
 - **Secure Authentication**: JWT-based authentication with role-based authorization
 
 ### 1.3 Technology Stack
-- **Backend**: ASP.NET Core 7.0 Web API
-- **Frontend**: Vue.js 3 with PrimeVue UI components
-- **Database**: PostgreSQL with Entity Framework Core
+- **Backend**: ASP.NET Core 10.0 Web API
+- **Frontend**: Vue.js 3.5 with PrimeVue 4.5 (Aura theme)
+- **Database**: PostgreSQL with Entity Framework Core (snake_case naming, serial PKs)
 - **Desktop**: WPF launcher application
-- **Authentication**: JWT Bearer tokens
-- **Testing**: NUnit with Selenium WebDriver
+- **Authentication**: JWT Bearer tokens (HMACSHA512, 12h expiry)
+- **Testing**: NUnit + Selenium WebDriver (Page Object Model)
 - **Logging**: Serilog with file and console outputs
 
 ---
@@ -55,7 +55,7 @@ graph TB
     end
     
     subgraph "Application Layer"
-        API[ASP.NET Core 7.0 Web API]
+        API[ASP.NET Core 10.0 Web API]
         Controllers[Controllers]
         Services[Services]
         Middleware[Custom Middleware]
@@ -89,8 +89,10 @@ graph TB
 #### 2.2.1 Backend Components
 - **Controllers**: Handle HTTP requests and responses
   - [`AuthController`](App/Controllers/AuthController.cs): Authentication endpoints
-  - [`ProjectsController`](App/Controllers/ProjectsController.cs): Project management
+  - [`ProjectsController`](App/Controllers/ProjectsController.cs): Project management + clone + FromTemplate
   - [`TodoItemsController`](App/Controllers/TodoItemsController.cs): Task operations
+  - [`ProjectTemplatesController`](App/Controllers/ProjectTemplatesController.cs): Template catalog management
+  - [`ProjectTemplateTasksController`](App/Controllers/ProjectTemplateTasksController.cs): Template task management
   - [`UsersController`](App/Controllers/UsersController.cs): User management
   - [`ProfilesController`](App/Controllers/ProfilesController.cs): Profile administration
   - [`SuperUsersController`](App/Controllers/SuperUsersController.cs): Super user operations
@@ -106,10 +108,12 @@ graph TB
 
 #### 2.2.2 Frontend Components
 - **Vue.js Application**: Single-page application structure
-  - [`App.vue`](App/vue/src/App.vue): Root application component
-  - [`MainPanel.vue`](App/vue/src/components/MainPanel.vue): Main task management interface
+  - [`App.vue`](App/vue/src/App.vue): Root component; holds `currentPage` state and top nav bar
+  - [`MainPanel.vue`](App/vue/src/components/MainPanel.vue): Tasks page (split-pane: projects + todo items)
+  - [`ProjectTemplatePage.vue`](App/vue/src/components/ProjectTemplatePage.vue): Templates reference-book page
   - [`LoginButton.vue`](App/vue/src/components/LoginButton.vue): Authentication component
-  - [`ProjectsPanel.vue`](App/vue/src/components/MainPage/ProjectsPanel.vue): Project management panel
+  - [`ProjectsPanel.vue`](App/vue/src/components/MainPage/ProjectsPanel.vue): Project list with drag-and-drop
+  - [`ProjectTemplatesPanel.vue`](App/vue/src/components/ProjectTemplates/ProjectTemplatesPanel.vue): Template list (left pane of templates page)
 
 ### 2.3 Data Flow Architecture
 
@@ -151,7 +155,10 @@ erDiagram
     Profile ||--o{ User : "has many"
     Profile ||--o{ Project : "owns"
     Profile ||--o{ TodoItem : "contains"
+    Profile ||--o{ ProjectTemplate : "owns"
+    Profile ||--o{ ProjectTemplateTask : "contains"
     Project ||--o{ TodoItem : "contains"
+    ProjectTemplate ||--o{ ProjectTemplateTask : "contains"
     
     Profile {
         bigint Id PK
@@ -191,6 +198,19 @@ erDiagram
         string Name
         boolean IsComplete
     }
+    
+    ProjectTemplate {
+        bigint Id PK
+        bigint ProfileId FK
+        string Name
+    }
+    
+    ProjectTemplateTask {
+        bigint Id PK
+        bigint ProfileId FK
+        bigint ProjectTemplateId FK
+        string Name
+    }
 ```
 
 ### 3.2 Database Schema Details
@@ -223,17 +243,47 @@ erDiagram
 - Completion status tracking
 - Dual foreign key relationship (Profile + Project)
 
+**ProjectTemplate Entity** ([`ProjectTemplate.cs`](App/Entities/ProjectTemplate.cs))
+- Named template owned by a Profile
+- Composite index on `(ProfileId, Id)` per Profile Segregation Principle
+- Cascade-deletes its items
+
+**ProjectTemplateTask Entity** ([`ProjectTemplateTask.cs`](App/Entities/ProjectTemplateTask.cs))
+- Single task in a template (name only)
+- Dual FK (Profile + ProjectTemplate); ProfileId redundancy allows direct profile-scoped queries
+
 #### 3.2.2 Database Configuration
 - **Naming Convention**: Snake_case column naming via EFCore.NamingConventions
 - **Primary Keys**: Auto-incrementing bigint (PostgreSQL serial)
 - **Indexes**: Unique constraints on critical lookup fields
 - **Relationships**: Explicit foreign key relationships with navigation properties
 
-### 3.3 Data Isolation Strategy
-- **Profile-based Tenancy**: All user data scoped to ProfileId
-- **Query Filtering**: Automatic profile filtering in all data access
-- **Security Enforcement**: Profile ID extracted from JWT claims
-- **Data Integrity**: Foreign key constraints ensure referential integrity
+### 3.3 Profile Segregation Principle
+
+All user-owned data is strictly scoped to a **Profile**. This is the primary security boundary in the system: one profile must never be able to read or modify another profile's data.
+
+#### Rule 1 — Every user-data entity carries `ProfileId`
+Any entity that stores data belonging to a user (projects, todo items, templates, etc.) must have a non-nullable `ProfileId` foreign key referencing the `Profiles` table. This column is always populated by the server from the authenticated user's JWT claims — it is never accepted from the request body.
+
+#### Rule 2 — Every query filters by `ProfileId`
+All `SELECT`, `UPDATE`, and `DELETE` operations on user-data tables must include `WHERE profile_id = {currentProfileId}`. The current profile ID is obtained exclusively from `IUserService.GetCurrentUserProfileId()`, which reads the claim injected during JWT validation. Example (EF Core):
+
+```csharp
+myDbContext.Projects
+    .Where(x => x.ProfileId == myProfileId)  // ← mandatory on every query
+    ...
+```
+
+Omitting this filter is a security defect.
+
+#### Rule 3 — Index on `(ProfileId, Id)`
+Each user-data table must have a composite index on `(profile_id, id)`. This ensures that the mandatory profile filter is covered by an index, preventing full-table scans as data grows.
+
+#### Rule 4 — Profile ID comes from the token, never from the client
+Controllers resolve `myProfileId` once in their constructor via `IUserService.GetCurrentUserProfileId()` and reuse it for every operation in the request. The client never sends a `profileId` field; any such field in a DTO is ignored.
+
+#### Rule 5 — Cascade delete from Profile
+All user-data tables must declare a cascading foreign key to `Profiles`. When a profile is deleted, all its data is automatically removed without requiring application-level cleanup.
 
 ---
 
@@ -309,6 +359,18 @@ erDiagram
 **Response**: Success confirmation
 **Security**: Requires authentication
 
+#### POST /api/Projects/FromTemplate
+**Purpose**: Create a new project pre-populated with items copied from a template
+**Request Body**:
+```json
+{
+  "name": "string",
+  "templateId": "number"
+}
+```
+**Response**: Created project ID
+**Security**: Requires authentication; validates template belongs to the calling user's profile
+
 ### 4.3 Task Management Endpoints
 
 #### GET /api/TodoItems
@@ -330,14 +392,47 @@ erDiagram
 **Response**: Success confirmation
 **Security**: Requires authentication
 
-### 4.4 Administrative Endpoints
+### 4.4 Project Template Endpoints
+
+#### GET /api/ProjectTemplates
+**Purpose**: List templates for the current user's profile
+**Response**: Array of `{ id, name }` objects
+**Security**: Requires authentication
+
+#### POST /api/ProjectTemplates
+**Purpose**: Create a new template
+**Request Body**: `{ "name": "string" }`
+**Response**: Created template ID
+**Security**: Requires authentication; ProfileId taken from JWT
+
+#### PATCH /api/ProjectTemplates
+**Purpose**: Rename or delete templates
+**Request Body**: `[{ type: "update", key: id, data: { name } }]` or `[{ type: "remove", key: id }]`
+**Security**: Requires authentication
+
+#### GET /api/ProjectTemplateTasks?projectTemplateId={id}
+**Purpose**: List tasks for a specific template
+**Response**: Array of `{ id, projectTemplateId, name }` objects
+**Security**: Requires authentication; validates template belongs to caller's profile
+
+#### POST /api/ProjectTemplateTasks
+**Purpose**: Add a task to a template
+**Request Body**: `{ "projectTemplateId": number, "name": "string" }`
+**Security**: Requires authentication; validates template belongs to caller's profile
+
+#### PATCH /api/ProjectTemplateTasks
+**Purpose**: Rename or delete template tasks
+**Request Body**: `[{ key: id, data: { name } }]` or `[{ type: "remove", key: id }]`
+**Security**: Requires authentication
+
+### 4.5 Administrative Endpoints
 
 #### GET /api/Users
 **Purpose**: List users in profile
 **Security**: Requires super user role
 
-#### POST /api/Users
-**Purpose**: Create new user
+#### POST /api/Users/register
+**Purpose**: Register a new user in a profile
 **Security**: Requires super user role
 
 #### GET /api/Profiles
@@ -348,24 +443,9 @@ erDiagram
 **Purpose**: Create new profile
 **Security**: Requires super user role
 
-### 4.5 API Response Formats
-
-**Success Response**:
-```json
-{
-  "data": "object or array",
-  "status": "success"
-}
-```
-
-**Error Response**:
-```json
-{
-  "error": "error message",
-  "status": "error",
-  "details": "additional error information"
-}
-```
+#### GET /api/Profiles/MaxId
+**Purpose**: Get the highest profile numeric ID (used by test setup)
+**Security**: Requires super user role
 
 ---
 
@@ -375,13 +455,20 @@ erDiagram
 
 #### 5.1.1 Component Hierarchy
 ```
-App.vue (Root)
-├── UserPanel.vue (Top toolbar)
-├── LoginButton.vue (Authentication)
+App.vue (Root — holds currentPage: 'main'|'templates', renders nav bar)
+├── UserPanel.vue (Top toolbar, shown when authenticated)
+├── LoginButton.vue (Authentication popover, shown when not authenticated)
 ├── NoAccessPanel.vue (Unauthorized state)
-└── MainPanel.vue (Main interface)
-    └── ProjectsPanel.vue (Project management)
+├── MainPanel.vue (Tasks page, currentPage === 'main')
+│   ├── ProjectsPanel.vue (left pane: project list, drag-and-drop, clone)
+│   │   └── NewProjectModal.vue (modal: name + optional template selection)
+│   └── TodoItems section (right pane: inline editing DataTable)
+└── ProjectTemplatePage.vue (Templates page, currentPage === 'templates')
+    ├── ProjectTemplatesPanel.vue (left pane: template list)
+    └── Template items DataTable (right pane: item list for selected template)
 ```
+
+Page switching is done via `currentPage` data property in `App.vue` — no Vue Router is used.
 
 #### 5.1.2 Key Components
 
@@ -420,7 +507,7 @@ App.vue (Root)
 #### 5.2.2 Data Flow
 - RESTful API communication via fetch utilities
 - Real-time UI updates after data operations
-- DevExtreme DataGrid integration for bulk operations
+- PrimeVue DataTable for data display and interaction
 - Error handling with user notifications
 
 ### 5.3 UI Framework Integration
@@ -435,7 +522,7 @@ App.vue (Root)
 
 #### 5.3.2 Additional Libraries
 - **vuedraggable** (SortableJS wrapper): Row drag-and-drop for project reordering (`forceFallback: true` for Selenium compatibility)
-- **Splitpanes**: Resizable panel layout
+- **Splitpanes**: Resizable split-pane layout used on both main and templates pages
 - **CSS Grid/Flexbox**: Modern layout techniques
 
 ### 5.4 Build and Development
@@ -449,7 +536,6 @@ App.vue (Root)
 #### 5.4.2 Asset Management
 - **Static Assets**: Public directory serving
 - **Component Styles**: Scoped CSS support
-- **External Libraries**: DevExtreme and jQuery integration
 
 ### 5.5 Drag-and-Drop Functionality
 
@@ -533,7 +619,7 @@ App.vue (Root)
 ### 7.1 Application Deployment
 
 #### 7.1.1 Backend Deployment
-- **Runtime**: .NET 7.0 runtime environment
+- **Runtime**: .NET 10.0 runtime environment
 - **Web Server**: Kestrel with reverse proxy (IIS/Nginx)
 - **Configuration**: Environment-specific appsettings
 - **Database**: PostgreSQL server connection
@@ -598,67 +684,14 @@ App.vue (Root)
 
 ## 8. Testing Strategy
 
-### 8.1 Testing Framework
+All tests are Selenium UI end-to-end tests. There are no unit tests or service mocks — tests run against a live app and real PostgreSQL database.
 
-#### 8.1.1 Integration Testing
-- **Framework**: NUnit testing framework
-- **Web Automation**: Selenium WebDriver
-- **Test Structure**: Page Object Model pattern
-- **Browser Support**: Chrome, Firefox, Edge
-
-#### 8.1.2 Test Organization
-- **Test Projects**: [`Tests.Integration`](IntegrationTests/Tests.Integration/Tests.Integration.csproj)
-- **Page Objects**: Reusable UI interaction components
-- **Test Utilities**: Common testing functionality
-- **Test Data**: Controlled test data management
-
-### 8.2 Test Categories
-
-#### 8.2.1 Unit Tests
-- **Controller Testing**: API endpoint validation
-- **Service Testing**: Business logic verification
-- **Entity Testing**: Data model validation
-- **Utility Testing**: Helper function verification
-
-#### 8.2.2 Integration Tests
-- **End-to-End Workflows**: Complete user scenarios
-- **API Integration**: Full request-response cycles
-- **Database Integration**: Data persistence verification
-- **Authentication Testing**: Security flow validation
-
-#### 8.2.3 UI Tests
-- **Component Testing**: Vue.js component functionality
-- **User Interaction**: Form submission and navigation
-- **Responsive Design**: Cross-device compatibility
-- **Accessibility Testing**: WCAG compliance verification
-
-### 8.3 Test Data Management
-
-#### 8.3.1 Test Database
-- **Isolated Environment**: Separate test database
-- **Data Seeding**: Controlled test data creation
-- **Cleanup Procedures**: Test data removal
-- **State Management**: Test isolation and repeatability
-
-#### 8.3.2 Mock Services
-- **External Dependencies**: Service mocking
-- **API Simulation**: Controlled response scenarios
-- **Error Simulation**: Failure condition testing
-- **Performance Testing**: Load and stress testing
-
-### 8.4 Continuous Testing
-
-#### 8.4.1 Automated Test Execution
-- **CI/CD Integration**: Automated test runs
-- **Test Reporting**: Detailed test result analysis
-- **Coverage Analysis**: Code coverage metrics
-- **Quality Gates**: Test-based deployment gates
-
-#### 8.4.2 Test Maintenance
-- **Test Refactoring**: Test code quality maintenance
-- **Test Data Updates**: Evolving test scenarios
-- **Framework Updates**: Testing tool upgrades
-- **Performance Optimization**: Test execution efficiency
+- **Framework**: NUnit + Selenium WebDriver (Chrome)
+- **Project**: [`Tests.Integration`](IntegrationTests/Tests.Integration/Tests.Integration.csproj)
+- **Pattern**: Page Object Model — see [`docs/testing-guide.md`](docs/testing-guide.md)
+- **Test isolation**: Each test creates a fresh profile via `TestsDecorators.Default()` and logs in as user `kevin`
+- **Test data**: Created programmatically via `TestDataBuilder` (HTTP calls using the app's own API)
+- **CSS selector contract**: All Selenium-targeted elements carry `se-*` CSS classes (see section 10.1.3)
 
 ---
 
@@ -668,7 +701,7 @@ App.vue (Root)
 
 #### 9.1.1 Server Requirements
 - **Operating System**: Windows Server 2019+ or Linux (Ubuntu 20.04+)
-- **Runtime**: .NET 7.0 Runtime
+- **Runtime**: .NET 10.0 Runtime
 - **Memory**: Minimum 4GB RAM, Recommended 8GB+
 - **Storage**: 50GB+ available disk space
 - **Network**: Stable internet connection for external dependencies
@@ -760,7 +793,16 @@ App.vue (Root)
 - **Component Structure**: Single File Components (SFC)
 - **Naming Conventions**: kebab-case for component names
 - **State Management**: Reactive data patterns
-- **Error Handling**: User-friendly error messages
+- **Error Handling**: User-friendly error messages via `notifyUtils.notifySystemError`
+
+#### 10.1.3 CSS Class Naming for Selenium
+All elements targeted by Selenium integration tests **must** have a `se-*` CSS class. This separates test selectors from style classes and prevents accidental breakage when styles are refactored.
+
+Examples: `se-add-row-button`, `se-new-project-dialog`, `se-text-editor-input`, `se-delete-item-button`
+
+Page Object elements use `By.CssSelector(".se-<name>")` to locate DOM nodes. If you add a UI feature that needs a test, add an `se-*` class to the element first.
+
+See [`docs/testing-guide.md`](docs/testing-guide.md) for the full testing conventions.
 
 #### 10.1.3 Database Standards
 - **Naming Convention**: snake_case for database objects
